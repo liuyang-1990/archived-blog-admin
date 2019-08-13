@@ -3,29 +3,40 @@ import React, { Component } from 'react';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { FormComponentProps } from 'antd/es/form';
 import Link from 'umi/link';
+import { observer } from 'mobx-react';
 import LoginComponents from '../components/Login';
+import { container } from '@/utils/ioc';
+import LoginState from '@/stores/login.state';
 import styles from './style.less';
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginComponents;
 
-interface LoginState {
-    type: string;
-    autoLogin: boolean;
-}
+// interface LoginState {
+//     type: string;
+//     autoLogin: boolean;
+// }
 export interface FormDataType {
     userName: string;
     password: string;
     mobile: string;
     captcha: string;
 }
-class Login extends Component<any, LoginState> {
+@observer
+class Login extends Component<any, any> {
     loginForm: FormComponentProps['form'] | undefined | null = undefined;
-
-    state: LoginState = {
-        type: 'account',
-        autoLogin: true,
-    };
-
+    private store: LoginState = container.get("LoginState");
+    // state: LoginState = {
+    //     type: 'account',
+    //     autoLogin: true,
+    // };
+    constructor(props) {
+        super(props);
+        this.state = {
+            type: 'account',
+            activeFields: ['UserName', 'Password'],
+            autoLogin: true
+        };
+    }
     changeAutoLogin = (e: CheckboxChangeEvent) => {
         this.setState({
             autoLogin: e.target.checked,
@@ -33,8 +44,8 @@ class Login extends Component<any, LoginState> {
     };
 
     handleSubmit = (err: any, values: FormDataType) => {
-       // const { type } = this.state;
-       
+        this.store.handleSubmit();
+
     };
 
     onTabChange = (type: string) => {
@@ -66,8 +77,8 @@ class Login extends Component<any, LoginState> {
     );
 
     render() {
-       // const { userLogin, submitting } = this.props;
-      //  const { status, type: loginType } = userLogin;
+        // const { userLogin, submitting } = this.props;
+        //  const { status, type: loginType } = userLogin;
         const { type, autoLogin } = this.state;
         return (
             <div className={styles.main}>
@@ -149,17 +160,17 @@ class Login extends Component<any, LoginState> {
                     </Tab>
                     <div>
                         <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>
-                           自动登录
+                            自动登录
                         </Checkbox>
                         <a style={{ float: 'right' }} href="">
-                           忘记密码
+                            忘记密码
                         </a>
                     </div>
                     <Submit >
                         登录
                     </Submit>
                     <div className={styles.other}>
-                         其他登录方式
+                        其他登录方式
                         <Icon type="alipay-circle" className={styles.icon} theme="outlined" />
                         <Icon type="taobao-circle" className={styles.icon} theme="outlined" />
                         <Icon type="weibo-circle" className={styles.icon} theme="outlined" />
