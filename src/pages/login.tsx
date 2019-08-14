@@ -2,7 +2,6 @@ import { Alert, Checkbox, Icon } from 'antd';
 import React, { Component } from 'react';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { FormComponentProps } from 'antd/es/form';
-import Link from 'umi/link';
 import { observer } from 'mobx-react';
 import LoginComponents from '../components/Login';
 import { container } from '@/utils/ioc';
@@ -11,29 +10,24 @@ import styles from './style.less';
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginComponents;
 
-// interface LoginState {
-//     type: string;
-//     autoLogin: boolean;
-// }
 export interface FormDataType {
     userName: string;
     password: string;
     mobile: string;
     captcha: string;
 }
+
 @observer
 class Login extends Component<any, any> {
-    loginForm: FormComponentProps['form'] | undefined | null = undefined;
+
+    private loginForm: FormComponentProps['form'] | undefined | null = undefined;
+
     private store: LoginState = container.get("LoginState");
-    // state: LoginState = {
-    //     type: 'account',
-    //     autoLogin: true,
-    // };
+
     constructor(props) {
         super(props);
         this.state = {
             type: 'account',
-            activeFields: ['UserName', 'Password'],
             autoLogin: true
         };
     }
@@ -44,42 +38,23 @@ class Login extends Component<any, any> {
     };
 
     handleSubmit = (err: any, values: FormDataType) => {
-        this.store.handleSubmit();
-
+        if (!err) {
+            this.store.handleSubmit(values);
+        }
     };
 
     onTabChange = (type: string) => {
         this.setState({ type });
     };
 
-    onGetCaptcha = () =>
-        new Promise((resolve, reject) => {
-            if (!this.loginForm) {
-                return;
-            }
-            this.loginForm.validateFields(['mobile'], {}, (err: any, values: FormDataType) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    const { dispatch } = this.props;
-                    ((dispatch({
-                        type: 'userLogin/getCaptcha',
-                        payload: values.mobile,
-                    }) as unknown) as Promise<any>)
-                        .then(resolve)
-                        .catch(reject);
-                }
-            });
-        });
 
     renderMessage = (content: string) => (
         <Alert style={{ marginBottom: 24 }} message={content} type="error" showIcon />
     );
 
     render() {
-        // const { userLogin, submitting } = this.props;
-        //  const { status, type: loginType } = userLogin;
         const { type, autoLogin } = this.state;
+        const { submitting, stateType } = this.store;
         return (
             <div className={styles.main}>
                 <LoginComponents
@@ -91,14 +66,13 @@ class Login extends Component<any, any> {
                     }}
                 >
                     <Tab key="account" tab={"账号密码登录"}>
-                        {/* {status === 'error' &&
-                            loginType === 'account' &&
-                            !submitting &&
-                            this.renderMessage(
-                                formatMessage({ id: 'user-login.login.message-invalid-credentials' }),
-                            )} */}
+                        {
+                            type === 'account' && !submitting &&
+                            stateType.status === 'error' &&
+                            this.renderMessage(stateType.message || '')
+                        }
                         <UserName
-                            name="userName"
+                            name="UserName"
                             placeholder={"用户名"}
                             rules={[
                                 {
@@ -108,7 +82,7 @@ class Login extends Component<any, any> {
                             ]}
                         />
                         <Password
-                            name="password"
+                            name="Password"
                             placeholder={"密码"}
                             rules={[
                                 {
@@ -123,12 +97,11 @@ class Login extends Component<any, any> {
                         />
                     </Tab>
                     <Tab key="mobile" tab={"手机号登录"}>
-                        {/* {status === 'error' &&
-                            loginType === 'mobile' &&
-                            !submitting &&
-                            this.renderMessage(
-                                formatMessage({ id: 'user-login.login.message-invalid-verification-code' }),
-                            )} */}
+                        {
+                            type === 'mobile' && !submitting &&
+                            stateType.status === 'error' &&
+                            this.renderMessage(stateType.message || '')
+                        }
                         <Mobile
                             name="mobile"
                             placeholder={'手机号'}
@@ -147,7 +120,7 @@ class Login extends Component<any, any> {
                             name="captcha"
                             placeholder={'验证码'}
                             countDown={120}
-                            onGetCaptcha={this.onGetCaptcha}
+                            //  onGetCaptcha={this.onGetCaptcha}
                             getCaptchaButtonText={"验证码"}
                             //getCaptchaSecondText={formatMessage({ id: 'user-login.captcha.second' })}
                             rules={[
@@ -166,7 +139,7 @@ class Login extends Component<any, any> {
                             忘记密码
                         </a>
                     </div>
-                    <Submit >
+                    <Submit loading={this.store.submitting} >
                         登录
                     </Submit>
                     <div className={styles.other}>

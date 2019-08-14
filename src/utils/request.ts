@@ -5,8 +5,6 @@
 import { extend } from 'umi-request';
 import { notification } from 'antd';
 
-
-
 const codeMessage = {
     200: '服务器成功返回请求的数据。',
     201: '新建或修改数据成功。',
@@ -40,36 +38,48 @@ const errorHandler = error => {
     });
 };
 
+let url = "http://localhost:49911/api/v1/";
+
+if (process.env.NODE_ENV === "production") {
+    url = "https://api.nayoung515.top/api/v1/";
+}
+
+
 const request = extend({
     headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
     },
     errorHandler, // 默认错误处理
-    //credentials: 'include', // 默认请求是否带上cookie,
-    prefix: 'http://localhost:49911/api/v1',
-    
+    credentials: 'include', // 默认请求是否带上cookie,
+    prefix: url,
 });
 
 
 // request拦截器
-// request.interceptors.request.use((url, options) => {
-//     if (localStorage.getItem("access_token")) {
-//         options.headers && options.headers.append()
-//         options.headers && options.headers["refresh_token"]; localStorage.getItem('refresh_token');
-//     }
-//     return (
-//         {
-//             url: `${url}&interceptors=yes`,
-//             options: { ...options },
-//         }
-//     )
-// });
+request.interceptors.request.use((url, options) => {
+    let token = localStorage.getItem("access_token");
+    let headers = { ...options.headers };
+    if (token) {
+        const addheaders = {
+            'refresh_token': localStorage.getItem('refresh_token'),
+            'Authorization': token
+        }
+        headers = Object.assign(headers, addheaders);
+    }
+    return (
+        {
+            url: `${url}`,
+            options: { ...options, headers: headers },
+        }
+    )
+});
 
 // response拦截器
 request.interceptors.response.use((response, options) => {
-    if (response.headers["authorization"]) {
-        localStorage.setItem('access_token', response.headers["authorization"]);
+    let token = response.headers.get("authorization");
+    if (token) {
+        localStorage.setItem('access_token', token);
     }
     return response;
 });
