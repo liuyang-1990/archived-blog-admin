@@ -77,7 +77,6 @@ export default {
     ) => {
       if (
         context.resourcePath.includes('node_modules') ||
-        context.resourcePath.includes('ant.design.pro.less') ||
         context.resourcePath.includes('global.less')
       ) {
         return localName;
@@ -86,12 +85,12 @@ export default {
       const match = context.resourcePath.match(/src(.*)/);
 
       if (match && match[1]) {
-        const antdProPath = match[1].replace('.less', '');
-        const arr = slash(antdProPath)
+        const path = match[1].replace('.less', '');
+        const arr = slash(path)
           .split('/')
           .map((a: string) => a.replace(/([A-Z])/g, '-$1'))
           .map((a: string) => a.toLowerCase());
-        return `antd-pro${arr.join('-')}-${localName}`.replace(/--/g, '-');
+        return `blog-admin${arr.join('-')}-${localName}`.replace(/--/g, '-');
       }
 
       return localName;
@@ -100,14 +99,5 @@ export default {
   manifest: {
     basePath: '/',
   },
-  chainWebpack: webpackPlugin,
-  /*
-  proxy: {
-    '/server/api/': {
-      target: 'https://preview.pro.ant.design/',
-      changeOrigin: true,
-      pathRewrite: { '^/server': '' },
-    },
-  },
-  */
+  chainWebpack: webpackPlugin
 } as IConfig;
