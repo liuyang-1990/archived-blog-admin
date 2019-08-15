@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "blog-admin",
+  "name": "An out-of-box UI solution for enterprise applications as a React boilerplate.",
   "icons": [
     {
       "src": "favicon.ico",
