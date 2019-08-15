@@ -7,6 +7,8 @@ import React from 'react';
 import Link from 'umi/link';
 import logo from '../assets/logo.svg';
 import { BackTop } from 'antd';
+import Authorized from '@/utils/Authorized';
+import RightContent from '@/components/GlobalHeader/RightContent';
 
 export interface BasicLayoutProps extends ProLayoutProps {
   breadcrumbNameMap: {
@@ -27,7 +29,7 @@ const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] =>
       ...item,
       children: item.children ? menuDataRender(item.children) : [],
     };
-    return localItem as MenuDataItem;
+    return Authorized.check(item.authority, localItem, null) as MenuDataItem;
   });
 
 const footerRender: BasicLayoutProps['footerRender'] = (_, defaultDom) => {
@@ -65,6 +67,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
           );
       }}
       footerRender={footerRender}
+      rightContentRender={rightProps => <RightContent {...rightProps} />}
       menuDataRender={menuDataRender}
       {...props}
     >

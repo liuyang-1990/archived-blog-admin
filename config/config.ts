@@ -94,6 +94,7 @@ export default {
     ) => {
       if (
         context.resourcePath.includes('node_modules') ||
+        context.resourcePath.includes('ant.design.pro.less') ||
         context.resourcePath.includes('global.less')
       ) {
         return localName;
@@ -107,7 +108,7 @@ export default {
           .split('/')
           .map((a: string) => a.replace(/([A-Z])/g, '-$1'))
           .map((a: string) => a.toLowerCase());
-        return `blog-admin${arr.join('-')}-${localName}`.replace(/--/g, '-');
+        return `antd-pro${arr.join('-')}-${localName}`.replace(/--/g, '-');
       }
 
       return localName;
