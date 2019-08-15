@@ -27,8 +27,8 @@ const checkPermissions = <T, K>(
   // 没有判定权限.默认查看所有
   // Retirement authority, return target;
   if (!authority) {
-    //return target;
-    return Exception;
+    return target;
+   //return Exception;
   }
   // 数组处理
   if (Array.isArray(authority)) {

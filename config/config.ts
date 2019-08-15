@@ -46,6 +46,23 @@ export default {
       authority: ['admin', 'user'],
       routes: [
         {
+          name: '异常页',
+          icon: 'warning',
+          path: '/exception',
+          routes: [
+            {
+              path: '/exception/403',
+              name: '403',
+              component: './exception/403',
+            },
+            {
+              path: '/exception/500',
+              name: '500',
+              component: './exception/500',
+            },
+          ]
+        },
+        {
           path: '/',
           name: '欢迎',
           icon: 'smile',
@@ -99,5 +116,5 @@ export default {
   manifest: {
     basePath: '/',
   },
-  chainWebpack: webpackPlugin
+  chainWebpack: webpackPlugin,
 } as IConfig;
