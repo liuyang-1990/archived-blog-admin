@@ -49,7 +49,7 @@ class Login extends Component<any, any> {
 
 
     renderMessage = (content: string) => (
-        <Alert style={{ marginBottom: 24 }} message={content} type="error" showIcon />
+        <Alert style={{ marginBottom: 24 }} message={content} type="error" showIcon={true} />
     );
 
     render() {
