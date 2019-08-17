@@ -5,7 +5,7 @@ import { FormComponentProps } from 'antd/es/form';
 import { observer } from 'mobx-react';
 import LoginComponents from '../components/Login';
 import { container } from '@/utils/ioc';
-import LoginState from '@/stores/login.state';
+import LoginState from '@/states/login.state';
 import styles from './style.less';
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginComponents;

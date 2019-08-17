@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 import getDecorators from "inversify-inject-decorators";
 import "reflect-metadata";
-import LoginState from "@/stores/login.state";
+import LoginState from "@/states/login.state";
 
 
 const container: Container = new Container();
