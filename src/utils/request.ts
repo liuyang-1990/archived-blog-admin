@@ -31,7 +31,10 @@ const errorHandler = error => {
     const { response = {} } = error;
     const errortext = codeMessage[response.status] || response.statusText;
     const { status, url } = response;
-
+    if (!status) {
+        notification.error({ message: error.message });
+        return;
+    }
     notification.error({
         message: `请求错误 ${status}: ${url}`,
         description: errortext,
@@ -39,11 +42,9 @@ const errorHandler = error => {
 };
 
 let url = "http://localhost:49911/api/v1/";
-
 if (process.env.NODE_ENV === "production") {
     url = "https://api.nayoung515.top/api/v1/";
 }
-
 
 const request = extend({
     headers: {

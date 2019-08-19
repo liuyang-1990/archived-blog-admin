@@ -9,9 +9,11 @@ class AvatarDropdown extends React.Component<any, any> {
   onMenuClick = (event: ClickParam) => {
     const { key } = event;
     if (key === 'logout') {
-      router.push(`/account/${key}`);
+      localStorage.clear();
+      router.push('/login');
       return;
     }
+    router.push(`/account/${key}`);
   };
 
   render(): React.ReactNode {

@@ -24,11 +24,15 @@ const checkPermissions = <T, K>(
   target: T,
   Exception: K,
 ): T | K | React.ReactNode => {
+
+  //先判断是否登录
+  if (!localStorage.getItem("access_token")) {
+    return Exception;
+  }
   // 没有判定权限.默认查看所有
   // Retirement authority, return target;
   if (!authority) {
     return target;
-   //return Exception;
   }
   // 数组处理
   if (Array.isArray(authority)) {

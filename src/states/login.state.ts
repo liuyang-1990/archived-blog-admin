@@ -21,8 +21,9 @@ export default class LoginState {
     @action.bound
     async handleSubmit(params) {
         this.submitting = true;
-        const response = await login(params);   
-        switch (response.Status) {         
+        const response = await login(params);
+        this.submitting = false;
+        switch (response && response.Status) {
             case "0":
                 localStorage.setItem("access_token", response.ResultInfo.AccessToken);
                 localStorage.setItem("refresh_token", response.ResultInfo.RefreshToken);
@@ -36,14 +37,13 @@ export default class LoginState {
                     status: 'error',
                     message: '用户名或者密码错误!'
                 };
-                this.submitting = false;
+
                 break;
             case "2":
                 this.stateType = {
                     status: 'error',
                     message: '用户被禁用!请联系管理员!'
                 };
-                this.submitting = false;
                 break;
         }
     }
