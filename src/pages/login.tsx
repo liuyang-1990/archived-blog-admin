@@ -4,7 +4,7 @@ import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { FormComponentProps } from 'antd/es/form';
 import { observer } from 'mobx-react';
 import LoginComponents from '../components/Login';
-import { container } from '@/utils/ioc';
+import { lazyInject } from '@/utils/ioc';
 import LoginState from '@/states/login.state';
 import styles from './style.less';
 
@@ -21,9 +21,9 @@ export interface FormDataType {
 class Login extends Component<any, any> {
 
     private loginForm: FormComponentProps['form'] | undefined | null = undefined;
-
-    private store: LoginState = container.get("LoginState");
-
+  
+    @lazyInject('LoginState')
+    private store!: LoginState;  //http://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html
     constructor(props) {
         super(props);
         this.state = {
