@@ -59,11 +59,11 @@ const request = extend({
 
 // request拦截器
 request.interceptors.request.use((url, options) => {
-    let token = localStorage.getItem("access_token");
+    let token = localStorage.getItem("x-access-token");
     let headers = { ...options.headers };
     if (token) {
         const addheaders = {
-            'refresh_token': localStorage.getItem('refresh_token'),
+            'x-refresh-token': localStorage.getItem('x-refresh-token'),
             'Authorization': token
         }
         headers = Object.assign(headers, addheaders);
@@ -80,7 +80,7 @@ request.interceptors.request.use((url, options) => {
 request.interceptors.response.use((response, options) => {
     let token = response.headers.get("authorization");
     if (token) {
-        localStorage.setItem('access_token', token);
+        localStorage.setItem('x-access-token', token);
     }
     return response;
 });

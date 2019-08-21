@@ -4,6 +4,7 @@ import { injectable } from 'inversify';
 import { getPageQuery } from '@/utils/utils';
 import router from 'umi/router';
 
+
 export interface StateType {
     status?: 'ok' | 'error';
     type?: string;
@@ -25,8 +26,8 @@ export default class LoginState {
         this.submitting = false;
         switch (response && response.Status) {
             case "0":
-                localStorage.setItem("access_token", response.ResultInfo.AccessToken);
-                localStorage.setItem("refresh_token", response.ResultInfo.RefreshToken);
+                localStorage.setItem("x-access-token", response.ResultInfo.AccessToken);
+                localStorage.setItem("x-refresh-token", response.ResultInfo.RefreshToken);
                 // const urlParams = new URL(window.location.href);
                 //const params = getPageQuery();
                 router.push("/");
