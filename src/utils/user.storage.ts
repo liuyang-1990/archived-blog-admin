@@ -25,6 +25,10 @@ class UserStorage {
         return JSON.parse(jwt["http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata"])
     }
 
+    get Authority() {
+        return this.CurrentUser.Role;
+    }
+
     get IsLogin() {
         return !!this.AccessToken;
     }

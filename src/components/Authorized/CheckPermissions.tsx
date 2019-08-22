@@ -2,6 +2,7 @@ import React from 'react';
 import { CURRENT } from './renderAuthorize';
 // eslint-disable-next-line import/no-cycle
 import PromiseRender from './PromiseRender';
+import userStorage from '@/utils/user.storage';
 
 export type IAuthorityType =
   | undefined
@@ -26,7 +27,7 @@ const checkPermissions = <T, K>(
 ): T | K | React.ReactNode => {
 
   //先判断是否登录
-  if (!localStorage.getItem("access_token")) {
+  if (!userStorage.IsLogin) {
     return Exception;
   }
   // 没有判定权限.默认查看所有

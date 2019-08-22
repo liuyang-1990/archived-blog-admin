@@ -10,7 +10,8 @@ class AvatarDropdown extends React.Component<any, any> {
     const { key } = event;
     if (key === 'logout') {
       localStorage.clear();
-      router.push('/login');
+      sessionStorage.clear();
+      router.push('/login?redirect=' + encodeURIComponent(window.location.href));
       return;
     }
     router.push(`/account/${key}`);

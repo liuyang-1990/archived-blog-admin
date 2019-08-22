@@ -21,7 +21,7 @@ export interface FormDataType {
 class Login extends Component<any, any> {
 
     private loginForm: FormComponentProps['form'] | undefined | null = undefined;
-  
+
     @lazyInject('LoginState')
     private store!: LoginState;  //http://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html
     constructor(props) {
@@ -39,7 +39,7 @@ class Login extends Component<any, any> {
 
     handleSubmit = (err: any, values: FormDataType) => {
         if (!err) {
-            this.store.handleSubmit(values);
+            this.store.handleSubmit(values, this.state.autoLogin);
         }
     };
 
