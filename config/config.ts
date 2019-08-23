@@ -35,7 +35,7 @@ export default {
       routes: [
         {
           path: '/login',
-          component: './login',
+          component: './User/login',
         },
       ],
     },
@@ -62,12 +62,12 @@ export default {
             },
           ]
         },
-        {
-          path: '/',
-          name: '欢迎',
-          icon: 'smile',
-          component: './Welcome',
-        },
+        // {
+        //   path: '/',
+        //   name: '欢迎',
+        //   icon: 'smile',
+        //   component: './Welcome',
+        // },
         {
           component: './404',
         },

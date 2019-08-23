@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { FormComponentProps } from 'antd/es/form';
 import { observer } from 'mobx-react';
-import LoginComponents from '../components/Login';
+import LoginComponents from '../../components/Login';
 import { lazyInject } from '@/utils/ioc';
 import LoginState from '@/states/login.state';
 import styles from './style.less';
