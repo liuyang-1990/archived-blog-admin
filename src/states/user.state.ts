@@ -8,7 +8,7 @@ export default class UserState {
     @observable loading: boolean = false;
     @observable data!: TableListData;
     @action.bound
-    async queryByPage(params) {
+    async queryByPage(params?: any) {
         this.loading = true;
         const response = await queryByPage(params);
         this.loading = false;

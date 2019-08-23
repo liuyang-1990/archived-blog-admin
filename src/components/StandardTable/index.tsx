@@ -116,7 +116,7 @@ class StandardTable extends Component<StandardTableProps<TableListItem>, Standar
       selectedRowKeys,
       onChange: this.handleRowSelectChange,
       getCheckboxProps: (record: TableListItem) => ({
-        disabled: record.disabled,
+        disabled: record.UserName == "admin",
       }),
     };
 

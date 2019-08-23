@@ -14,19 +14,34 @@ import {
     Menu,
     Row,
     Select,
+    message,
 } from 'antd';
 import styles from './style.less';
 import StandardTable, { StandardTableColumnProps } from '@/components/StandardTable';
 import moment from 'moment';
-import { TableListItem } from '@/models/TableList';
+import { TableListItem, TableListPagination, TableListParams } from '@/models/TableList';
 import { observer } from 'mobx-react';
 import { lazyInject } from '@/utils/ioc';
 import UserState from '@/states/user.state';
+import CreateForm from '@/components/StandardTable/CreateForm';
 const FormItem = Form.Item;
 const { Option } = Select;
 
+const getValue = (obj: { [x: string]: string[] }) =>
+    Object.keys(obj)
+        .map(key => obj[key])
+        .join(',');
+
+
+interface IUserManagementState {
+    selectedRows: TableListItem[];
+    formValues: { [key: string]: string };
+    modalVisible: boolean;
+}
+
+
 @observer
-class UserManagement extends Component<any, any> {
+class UserManagement extends Component<any, IUserManagementState> {
 
     @lazyInject('UserState')
     private store!: UserState;
@@ -34,7 +49,9 @@ class UserManagement extends Component<any, any> {
     constructor(props) {
         super(props);
         this.state = {
-            selectedRows: []
+            selectedRows: [],
+            formValues: {},
+            modalVisible: false,
         }
     }
     columns: StandardTableColumnProps[] = [
@@ -76,7 +93,7 @@ class UserManagement extends Component<any, any> {
     ];
 
     componentDidMount() {
-        this.store.queryByPage(1);
+        this.store.queryByPage();
     }
 
     handleSelectRows = (rows: TableListItem[]) => {
@@ -84,18 +101,69 @@ class UserManagement extends Component<any, any> {
             selectedRows: rows,
         });
     };
-
-    handleSearch = () => {
+    //搜索
+    handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        const { form } = this.props;
+        form.validateFields((err, fieldsValue) => {
+            if (err) return;
+            const values = { ...fieldsValue };
+            this.setState({
+                formValues: values,
+            });
+            this.store.queryByPage(values);
+        });
+    }
+    //重置
+    handleFormReset = () => {
+        this.props.form.resetFields();
+        this.setState({
+            formValues: {},
+        });
 
     }
-
-    handleMenuClick = () => {
-
+    handleMenuClick = (e: { key: string }) => {
+        const { selectedRows } = this.state;
+        if (!selectedRows) return;
+        switch (e.key) {
+            case 'remove':
+                break;
+        }
     }
 
-    handleTableChange = () => {
+    handleTableChange = (
+        pagination: Partial<TableListPagination>,
+        filtersArg: Record<keyof TableListItem, string[]>,
+        sorter: SorterResult<TableListItem>,
+    ) => {
+        const { formValues } = this.state;
+        const filters = Object.keys(filtersArg).reduce((obj, key) => {
+            const newObj = { ...obj };
+            newObj[key] = getValue(filtersArg[key]);
+            return newObj;
+        }, {});
 
+        const params: Partial<TableListParams> = {
+            PageNum: pagination.current,
+            PageSize: pagination.pageSize,
+            ...formValues,
+            ...filters,
+        };
+        if (sorter.field) {
+            params.SortField = sorter.field;
+            switch (sorter.order) {
+                case 'ascend':
+                    params.SortOrder = 'asc';
+                    break;
+                case 'descend':
+                    params.SortOrder = 'desc';
+                    break;
+            }
+        }
+        this.store.queryByPage(params);
     }
+
+
 
     renderSearchForm() {
         const {
@@ -125,10 +193,10 @@ class UserManagement extends Component<any, any> {
                     <div style={{ float: 'right', marginBottom: 24 }}>
                         <Button type="primary" htmlType="submit">
                             查询
-                </Button>
-                        <Button style={{ marginLeft: 8 }}>
+                        </Button>
+                        <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                             清空
-                </Button>
+                        </Button>
                     </div>
                 </div>
 
@@ -136,14 +204,31 @@ class UserManagement extends Component<any, any> {
         );
     }
 
+    handleAdd = () => {
+
+        message.success('添加成功');
+        this.handleModalVisible();
+    }
+
+    handleModalVisible = (flag?: boolean) => {
+        this.setState({
+            modalVisible: !!flag,
+        });
+    };
+
     render() {
-        const { selectedRows } = this.state;
+        const { selectedRows, modalVisible } = this.state;
         const menu = (
             <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
                 <Menu.Item key="remove">批量删除</Menu.Item>
+                <Menu.Item key="update">批量启用</Menu.Item>
             </Menu>
         );
 
+        const parentMethods = {
+            handleAdd: this.handleAdd,
+            handleModalVisible: this.handleModalVisible,
+        };
         return (
             <PageHeaderWrapper>
                 <Card bordered={false}>
@@ -152,7 +237,7 @@ class UserManagement extends Component<any, any> {
                             {this.renderSearchForm()}
                         </div>
                         <div className={styles.tableListOperator}>
-                            <Button type="primary">
+                            <Button type="primary" onClick={() => this.handleModalVisible(true)}>
                                 新建
                             </Button>
                             {selectedRows.length > 0 && (
@@ -175,6 +260,7 @@ class UserManagement extends Component<any, any> {
                         />
                     </div>
                 </Card>
+                <CreateForm {...parentMethods} modalVisible={modalVisible} />
             </PageHeaderWrapper>
         );
     }
