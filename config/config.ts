@@ -46,6 +46,18 @@ export default {
       authority: ['admin', 'user'],
       routes: [
         {
+          name: '系统管理',
+          icon: 'setting',
+          path: '/system',
+          routes: [
+            {
+              path: '/system/user',
+              name: '用户管理',
+              component: './SystemManagement/UserManagement',
+            },
+          ]
+        },
+        {
           name: '异常页',
           icon: 'warning',
           path: '/exception',
@@ -62,12 +74,6 @@ export default {
             },
           ]
         },
-        // {
-        //   path: '/',
-        //   name: '欢迎',
-        //   icon: 'smile',
-        //   component: './Welcome',
-        // },
         {
           component: './404',
         },
