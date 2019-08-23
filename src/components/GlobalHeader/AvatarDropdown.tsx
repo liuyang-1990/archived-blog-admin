@@ -4,6 +4,7 @@ import React from 'react';
 import router from 'umi/router';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
+import { userStorage } from '@/utils/user.storage';
 
 class AvatarDropdown extends React.Component<any, any> {
   onMenuClick = (event: ClickParam) => {
@@ -18,10 +19,9 @@ class AvatarDropdown extends React.Component<any, any> {
   };
 
   render(): React.ReactNode {
-    const currentUser = {
-      name: "Luis",
-      avatar: "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png"
-    };
+
+    const currentUser = userStorage.CurrentUser;
+
     const menuHeaderDropdown = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
         <Menu.Item key="center">
@@ -40,11 +40,11 @@ class AvatarDropdown extends React.Component<any, any> {
       </Menu>
     );
 
-    return currentUser && currentUser.name ? (
+    return currentUser && currentUser.UserName ? (
       <HeaderDropdown overlay={menuHeaderDropdown}>
         <span className={`${styles.action} ${styles.account}`}>
-          <Avatar size="small" className={styles.avatar} src={currentUser.avatar} alt="avatar" />
-          <span className={styles.name}>{currentUser.name}</span>
+          <Avatar size="small" className={styles.avatar} src={currentUser.Avatar} alt="avatar" />
+          <span className={styles.name}>{currentUser.UserName}</span>
         </span>
       </HeaderDropdown>
     ) : (

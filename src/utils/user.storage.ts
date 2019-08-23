@@ -4,7 +4,7 @@ export interface IJwtModel {
     Uid: number,
     Role: string,
     UserName: string,
-    Avtar: string
+    Avatar: string
 }
 
 class UserStorage {
@@ -19,20 +19,23 @@ class UserStorage {
             : sessionStorage.getItem('x-refresh-token');
     }
 
-    get CurrentUser(): IJwtModel {
+    get CurrentUser(): IJwtModel | null {
         const token = this.AccessToken;
-        const jwt = decodeJwt(token);
-        return JSON.parse(jwt["http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata"])
+        try {
+            const jwt = decodeJwt(token);
+            return JSON.parse(jwt["http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata"])
+        } catch (err) {
+            //console.log(err);
+            return null;
+        }
     }
 
     get Authority() {
-        return this.CurrentUser.Role;
+        return this.CurrentUser && this.CurrentUser.Role;
     }
 
     get IsLogin() {
         return !!this.AccessToken;
     }
-
 }
-
-export default new UserStorage()
+export const userStorage = new UserStorage();
