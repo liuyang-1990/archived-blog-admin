@@ -116,14 +116,14 @@ class StandardTable extends Component<StandardTableProps<TableListItem>, Standar
       selectedRowKeys,
       onChange: this.handleRowSelectChange,
       getCheckboxProps: (record: TableListItem) => ({
-        disabled: record.UserName == "admin",
+        disabled: record.UserName === "admin",
       }),
     };
 
     return (
       <div className={styles.standardTable}>
         <Table
-          rowKey={rowKey || 'id'}
+          rowKey={rowKey || 'Id'}
           rowSelection={rowSelection}
           dataSource={list}
           pagination={paginationProps}

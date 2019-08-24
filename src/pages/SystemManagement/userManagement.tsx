@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { FormComponentProps } from 'antd/es/form';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { SorterResult } from 'antd/es/table';
 import {
@@ -14,16 +13,17 @@ import {
     Menu,
     Row,
     Select,
-    message,
+    Popconfirm,
 } from 'antd';
 import styles from './style.less';
 import StandardTable, { StandardTableColumnProps } from '@/components/StandardTable';
-import moment from 'moment';
+import { toLocaleTimeString } from '@/utils/utils';
 import { TableListItem, TableListPagination, TableListParams } from '@/models/TableList';
 import { observer } from 'mobx-react';
 import { lazyInject } from '@/utils/ioc';
 import UserState from '@/states/user.state';
 import CreateForm from '@/components/StandardTable/CreateForm';
+
 const FormItem = Form.Item;
 const { Option } = Select;
 
@@ -33,18 +33,12 @@ const getValue = (obj: { [x: string]: string[] }) =>
         .join(',');
 
 
-interface IUserManagementState {
-    selectedRows: TableListItem[];
-    formValues: { [key: string]: string };
-    modalVisible: boolean;
-}
-
-
 @observer
-class UserManagement extends Component<any, IUserManagementState> {
+class UserManagement extends Component<any, any> {
 
     @lazyInject('UserState')
     private store!: UserState;
+    private formRef: any;
 
     constructor(props) {
         super(props);
@@ -52,6 +46,8 @@ class UserManagement extends Component<any, IUserManagementState> {
             selectedRows: [],
             formValues: {},
             modalVisible: false,
+            enable: 1,
+            modalFormValues: {}
         }
     }
     columns: StandardTableColumnProps[] = [
@@ -77,7 +73,7 @@ class UserManagement extends Component<any, IUserManagementState> {
             align: 'center',
             sorter: true,
             dataIndex: 'CreateTime',
-            render: (createTime: string) => <span>{moment(createTime).format('YYYY-MM-DD HH:mm:ss')}</span>,
+            render: (createTime: string) => <span>{toLocaleTimeString(createTime)}</span>,
         },
         {
             title: '操作',
@@ -85,15 +81,27 @@ class UserManagement extends Component<any, IUserManagementState> {
             key: 'x',
             render: (record) => record.UserName !== "admin" &&
                 <React.Fragment>
-                    <a>编辑</a>
+                    <a onClick={() => this.handleModalVisible(true, record)}>编辑</a>
                     <Divider type="vertical" />
-                    <a>删除</a>
+                    <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.Id)}>
+                        <a>删除</a>
+                    </Popconfirm>
                 </React.Fragment>
         },
     ];
 
+    remove = (key) => {
+        this.store.deleteUser(key);
+    }
+
     componentDidMount() {
         this.store.queryByPage();
+    }
+
+    handleSelectChange = (value) => {
+        this.handleSelectRows([]);
+        this.setState({ enable: value });
+        this.store.queryByPage({ "Status": value });
     }
 
     handleSelectRows = (rows: TableListItem[]) => {
@@ -120,13 +128,18 @@ class UserManagement extends Component<any, IUserManagementState> {
         this.setState({
             formValues: {},
         });
-
+        this.store.queryByPage();
     }
     handleMenuClick = (e: { key: string }) => {
-        const { selectedRows } = this.state;
+        const { selectedRows, enable } = this.state;
         if (!selectedRows) return;
         switch (e.key) {
-            case 'remove':
+            case 'update':
+                this.store.UpdateStatus({
+                    Ids: selectedRows.map(row => row.Id),
+                    Status: enable == 1 ? 0 : 1
+                });
+                this.handleSelectRows([]);
                 break;
         }
     }
@@ -182,7 +195,7 @@ class UserManagement extends Component<any, IUserManagementState> {
                             {getFieldDecorator('Status', {
                                 initialValue: "1"
                             })(
-                                <Select style={{ width: '100%' }}>
+                                <Select style={{ width: '100%' }} onChange={this.handleSelectChange}>
                                     <Option value="1">启用</Option>
                                     <Option value="0">禁用</Option>
                                 </Select>)}
@@ -204,29 +217,36 @@ class UserManagement extends Component<any, IUserManagementState> {
         );
     }
 
-    handleAdd = () => {
-
-        message.success('添加成功');
-        this.handleModalVisible();
+    handleOk = async (params) => {
+        await this.store.addUser(params, () => {
+            this.formRef.props.form.resetFields();
+            this.handleModalVisible();
+        });
     }
 
-    handleModalVisible = (flag?: boolean) => {
+    handleModalVisible = (flag?: boolean, record?: any) => {
+        const values = record ? {
+            Id: record.Id,
+            UserName: record.UserName,
+            Role: record.Role.toString(),
+            Status: record.Status.toString()
+        } : { Status: "1", Role: "0" };
         this.setState({
-            modalVisible: !!flag,
+            modalFormValues: values,
+            modalVisible: !!flag
         });
     };
 
     render() {
-        const { selectedRows, modalVisible } = this.state;
+        const { selectedRows, modalVisible, enable, modalFormValues } = this.state;
         const menu = (
             <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-                <Menu.Item key="remove">批量删除</Menu.Item>
-                <Menu.Item key="update">批量启用</Menu.Item>
+                <Menu.Item key="update">批量{enable == 1 ? '禁用' : '启用'}</Menu.Item>
             </Menu>
         );
 
         const parentMethods = {
-            handleAdd: this.handleAdd,
+            handleOk: this.handleOk,
             handleModalVisible: this.handleModalVisible,
         };
         return (
@@ -260,7 +280,13 @@ class UserManagement extends Component<any, IUserManagementState> {
                         />
                     </div>
                 </Card>
-                <CreateForm {...parentMethods} modalVisible={modalVisible} />
+                {modalFormValues && Object.keys(modalFormValues).length ?
+                    <CreateForm
+                        wrappedComponentRef={inst => this.formRef = inst}
+                        {...parentMethods}
+                        modalVisible={modalVisible}
+                        values={modalFormValues}
+                    /> : null}
             </PageHeaderWrapper>
         );
     }

@@ -1,10 +1,10 @@
 export interface TableListItem {
-  Id: number,
-  UserName: string,
-  Role: number,
-  Status: number,
-  Avatar: string,
-  CreateTime: string,
+  Id?: number,
+  UserName?: string,
+  Role?: string,
+  Status?: string,
+  Avatar?: string,
+  CreateTime?: string,
 }
 
 
