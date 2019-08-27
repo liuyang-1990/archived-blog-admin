@@ -46,6 +46,18 @@ export default {
       authority: ['admin', 'user'],
       routes: [
         {
+          name: '标签页',
+          icon: 'tag',
+          path: '/tag',
+          routes: [
+            {
+              path: '/tag/list',
+              name: '标签列表',
+              component: './Tag/TagInfo',
+            },
+          ]
+        },
+        {
           name: '系统管理',
           icon: 'setting',
           path: '/system',
