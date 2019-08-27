@@ -1,16 +1,16 @@
 import { Form, Input, Modal, Select } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import React from 'react';
-import { TableListItem } from '@/models/TableList';
+import { IUserTableListItem } from '@/models/UserTableList';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
 
 interface ICreateFormProps extends FormComponentProps {
     modalVisible: boolean;
-    handleOk: (fieldsValue: Partial<TableListItem>) => void;
-    handleModalVisible: (flag?: boolean, formVals?: Partial<TableListItem>) => void;
-    values: Partial<TableListItem>;
+    handleOk: (fieldsValue: Partial<IUserTableListItem>) => void;
+    handleModalVisible: (flag?: boolean, formVals?: Partial<IUserTableListItem>) => void;
+    values: Partial<IUserTableListItem>;
 }
 
 class CreateForm extends React.Component<ICreateFormProps, any>{
@@ -23,14 +23,6 @@ class CreateForm extends React.Component<ICreateFormProps, any>{
                 Status: props.values.Status,
                 Role: props.values.Role,
             }
-        }
-    }
-
-    componentWillReceiveProps(nextProps: ICreateFormProps) {
-        if (Object.keys(nextProps.values).length != Object.keys(this.props.values).length) {
-            this.setState({
-                formVals: nextProps.values
-            });
         }
     }
     render() {
@@ -64,16 +56,16 @@ class CreateForm extends React.Component<ICreateFormProps, any>{
                     {form.getFieldDecorator('Status', {
                         initialValue: oldValue.Status,
                     })(<Select style={{ width: '100%' }}>
-                        <Option value="1">启用</Option>
-                        <Option value="0">禁用</Option>
+                        <Option value={1}>启用</Option>
+                        <Option value={0}>禁用</Option>
                     </Select>)}
                 </FormItem>
                 <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="角色">
                     {form.getFieldDecorator('Role', {
                         initialValue: oldValue.Role,
                     })(<Select style={{ width: '100%' }}>
-                        <Option value="1">管理员</Option>
-                        <Option value="0">游客</Option>
+                        <Option value={1}>管理员</Option>
+                        <Option value={0}>游客</Option>
                     </Select>)}
                 </FormItem>
             </Modal>

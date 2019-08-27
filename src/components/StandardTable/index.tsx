@@ -2,30 +2,30 @@ import { Table } from 'antd';
 import { ColumnProps, TableRowSelection, TableProps } from 'antd/es/table';
 import React, { Component } from 'react';
 import styles from './index.less';
-import { TableListItem } from '@/models/TableList';
+import { ITableListItem } from '@/models/TableList';
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
-export interface StandardTableProps<T> extends Omit<TableProps<T>, 'columns'> {
-  columns: StandardTableColumnProps[];
+export interface StandardTableProps<T extends ITableListItem> extends Omit<TableProps<T>, 'columns'> {
+  columns: StandardTableColumnProps<T>[];
   data: {
-    list: TableListItem[];
-    pagination: StandardTableProps<TableListItem>['pagination'];
+    list: T[];
+    pagination: StandardTableProps<T>['pagination'];
   };
-  selectedRows: TableListItem[];
+  selectedRows: T[];
   onSelectRow: (rows: any) => void;
 }
 
-export interface StandardTableColumnProps extends ColumnProps<TableListItem> {
+export interface StandardTableColumnProps<T extends ITableListItem> extends ColumnProps<T> {
   needTotal?: boolean;
   total?: number;
 }
 
-function initTotalList(columns: StandardTableColumnProps[]) {
+function initTotalList<T extends ITableListItem>(columns: StandardTableColumnProps<T>[]) {
   if (!columns) {
     return [];
   }
-  const totalList: StandardTableColumnProps[] = [];
+  const totalList: StandardTableColumnProps<T>[] = [];
   columns.forEach(column => {
     if (column.needTotal) {
       totalList.push({ ...column, total: 0 });
@@ -34,13 +34,13 @@ function initTotalList(columns: StandardTableColumnProps[]) {
   return totalList;
 }
 
-interface StandardTableState {
+interface StandardTableState<T extends ITableListItem> {
   selectedRowKeys: string[];
-  needTotalList: StandardTableColumnProps[];
+  needTotalList: StandardTableColumnProps<T>[];
 }
 
-class StandardTable extends Component<StandardTableProps<TableListItem>, StandardTableState> {
-  static getDerivedStateFromProps(nextProps: StandardTableProps<TableListItem>) {
+class StandardTable<T extends ITableListItem> extends Component<StandardTableProps<T>, StandardTableState<T>> {
+  static getDerivedStateFromProps(nextProps: StandardTableProps<ITableListItem>) {
     // clean state
     if (nextProps.selectedRows.length === 0) {
       const needTotalList = initTotalList(nextProps.columns);
@@ -52,20 +52,19 @@ class StandardTable extends Component<StandardTableProps<TableListItem>, Standar
     return null;
   }
 
-  constructor(props: StandardTableProps<TableListItem>) {
+  constructor(props: StandardTableProps<T>) {
     super(props);
     const { columns } = props;
     const needTotalList = initTotalList(columns);
-
     this.state = {
       selectedRowKeys: [],
       needTotalList,
     };
   }
 
-  handleRowSelectChange: TableRowSelection<TableListItem>['onChange'] = (
+  handleRowSelectChange: TableRowSelection<T>['onChange'] = (
     selectedRowKeys,
-    selectedRows: TableListItem[],
+    selectedRows: T[],
   ) => {
     const currySelectedRowKeys = selectedRowKeys as string[];
     let { needTotalList } = this.state;
@@ -81,7 +80,7 @@ class StandardTable extends Component<StandardTableProps<TableListItem>, Standar
     this.setState({ selectedRowKeys: currySelectedRowKeys, needTotalList });
   };
 
-  handleTableChange: TableProps<TableListItem>['onChange'] = (
+  handleTableChange: TableProps<T>['onChange'] = (
     pagination,
     filters,
     sorter,
@@ -112,11 +111,11 @@ class StandardTable extends Component<StandardTableProps<TableListItem>, Standar
       }
       : false;
 
-    const rowSelection: TableRowSelection<TableListItem> = {
+    const rowSelection: TableRowSelection<T> = {
       selectedRowKeys,
       onChange: this.handleRowSelectChange,
-      getCheckboxProps: (record: TableListItem) => ({
-        disabled: record.UserName === "admin",
+      getCheckboxProps: (record: T) => ({
+        disabled: record.disabled  //record.UserName === "admin",
       }),
     };
 

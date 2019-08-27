@@ -18,11 +18,13 @@ import {
 import styles from './style.less';
 import StandardTable, { StandardTableColumnProps } from '@/components/StandardTable';
 import { toLocaleTimeString } from '@/utils/utils';
-import { TableListItem, TableListPagination, TableListParams } from '@/models/TableList';
 import { observer } from 'mobx-react';
 import { lazyInject } from '@/utils/ioc';
 import UserState from '@/states/user.state';
 import CreateForm from '@/components/StandardTable/CreateForm';
+import { IUserTableListItem, IUserTableListParams } from '@/models/UserTableList';
+import { ITableListPagination } from '@/models/TableList';
+import { FormComponentProps } from 'antd/lib/form';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -32,25 +34,36 @@ const getValue = (obj: { [x: string]: string[] }) =>
         .map(key => obj[key])
         .join(',');
 
+interface IUserInfoProps extends FormComponentProps {
+
+}
+
+interface IUserInfoState {
+    modalVisible: boolean;
+    selectedRows: IUserTableListItem[];
+    formValues: { [key: string]: string };
+    modalFormValues: Partial<IUserTableListItem>;
+    enableShow: boolean; //更多操作按钮显示启用还是禁用 true-> 启用 false->禁用
+}
 
 @observer
-class UserManagement extends Component<any, any> {
+class UserManagement extends Component<IUserInfoProps, IUserInfoState> {
 
     @lazyInject('UserState')
     private store!: UserState;
     private formRef: any;
 
-    constructor(props) {
+    constructor(props: IUserInfoProps) {
         super(props);
         this.state = {
             selectedRows: [],
             formValues: {},
             modalVisible: false,
-            enable: 1,
+            enableShow: false,
             modalFormValues: {}
         }
     }
-    columns: StandardTableColumnProps[] = [
+    columns: StandardTableColumnProps<IUserTableListItem>[] = [
         {
             title: '用户名',
             align: 'center',
@@ -79,7 +92,7 @@ class UserManagement extends Component<any, any> {
             title: '操作',
             align: 'center',
             key: 'x',
-            render: (record) => record.UserName !== "admin" &&
+            render: (record: IUserTableListItem) => !record.disabled &&
                 <React.Fragment>
                     <a onClick={() => this.handleModalVisible(true, record)}>编辑</a>
                     <Divider type="vertical" />
@@ -90,7 +103,7 @@ class UserManagement extends Component<any, any> {
         },
     ];
 
-    remove = (key) => {
+    remove = (key: number) => {
         this.store.deleteUser(key);
     }
 
@@ -98,13 +111,13 @@ class UserManagement extends Component<any, any> {
         this.store.queryByPage();
     }
 
-    handleSelectChange = (value) => {
+    handleSelectChange = (value: number) => {
         this.handleSelectRows([]);
-        this.setState({ enable: value });
+        this.setState({ enableShow: !value });
         this.store.queryByPage({ "Status": value });
     }
 
-    handleSelectRows = (rows: TableListItem[]) => {
+    handleSelectRows = (rows: IUserTableListItem[]) => {
         this.setState({
             selectedRows: rows,
         });
@@ -131,13 +144,13 @@ class UserManagement extends Component<any, any> {
         this.store.queryByPage();
     }
     handleMenuClick = (e: { key: string }) => {
-        const { selectedRows, enable } = this.state;
+        const { selectedRows, enableShow } = this.state;
         if (!selectedRows) return;
         switch (e.key) {
             case 'update':
                 this.store.UpdateStatus({
                     Ids: selectedRows.map(row => row.Id),
-                    Status: enable == 1 ? 0 : 1
+                    Status: enableShow ? 1 : 0
                 });
                 this.handleSelectRows([]);
                 break;
@@ -145,9 +158,9 @@ class UserManagement extends Component<any, any> {
     }
 
     handleTableChange = (
-        pagination: Partial<TableListPagination>,
-        filtersArg: Record<keyof TableListItem, string[]>,
-        sorter: SorterResult<TableListItem>,
+        pagination: Partial<ITableListPagination>,
+        filtersArg: Record<keyof IUserTableListItem, string[]>,
+        sorter: SorterResult<IUserTableListItem>,
     ) => {
         const { formValues } = this.state;
         const filters = Object.keys(filtersArg).reduce((obj, key) => {
@@ -156,7 +169,7 @@ class UserManagement extends Component<any, any> {
             return newObj;
         }, {});
 
-        const params: Partial<TableListParams> = {
+        const params: Partial<IUserTableListParams> = {
             PageNum: pagination.current,
             PageSize: pagination.pageSize,
             ...formValues,
@@ -193,11 +206,11 @@ class UserManagement extends Component<any, any> {
                     <Col md={8} sm={24}>
                         <FormItem label={"状态"}>
                             {getFieldDecorator('Status', {
-                                initialValue: "1"
+                                initialValue: 1
                             })(
                                 <Select style={{ width: '100%' }} onChange={this.handleSelectChange}>
-                                    <Option value="1">启用</Option>
-                                    <Option value="0">禁用</Option>
+                                    <Option value={1}>启用</Option>
+                                    <Option value={0}>禁用</Option>
                                 </Select>)}
                         </FormItem>
                     </Col>
@@ -224,13 +237,13 @@ class UserManagement extends Component<any, any> {
         });
     }
 
-    handleModalVisible = (flag?: boolean, record?: any) => {
+    handleModalVisible = (flag?: boolean, record?: Partial<IUserTableListItem>) => {
         const values = record ? {
             Id: record.Id,
             UserName: record.UserName,
-            Role: record.Role.toString(),
-            Status: record.Status.toString()
-        } : { Status: "1", Role: "0" };
+            Role: record.Role,
+            Status: record.Status
+        } : { Status: 1, Role: 0 };
         this.setState({
             modalFormValues: values,
             modalVisible: !!flag
@@ -238,10 +251,10 @@ class UserManagement extends Component<any, any> {
     };
 
     render() {
-        const { selectedRows, modalVisible, enable, modalFormValues } = this.state;
+        const { selectedRows, modalVisible, enableShow, modalFormValues } = this.state;
         const menu = (
             <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-                <Menu.Item key="update">批量{enable == 1 ? '禁用' : '启用'}</Menu.Item>
+                <Menu.Item key="update">批量{enableShow ? '启用' : '禁用'}</Menu.Item>
             </Menu>
         );
 
@@ -282,6 +295,7 @@ class UserManagement extends Component<any, any> {
                 </Card>
                 {modalFormValues && Object.keys(modalFormValues).length ?
                     <CreateForm
+                        key={modalFormValues.Id}
                         wrappedComponentRef={inst => this.formRef = inst}
                         {...parentMethods}
                         modalVisible={modalVisible}

@@ -20,7 +20,7 @@ class UserLayout extends React.Component<any, any> {
           </div>
           {this.props.children}
         </div>
-        <FooterView copyright="2019 created by liuyang" />
+        <FooterView copyright="2019 created by liuyang | Powered by .Net Core 2.2 on Linux" />
       </div>
     );
 

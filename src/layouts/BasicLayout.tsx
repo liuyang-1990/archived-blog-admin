@@ -54,7 +54,7 @@ const links = [{
 
 const copyright = (
   <Fragment>
-    Copyright <Icon type="copyright" /> 2019 created by liuyang
+    Copyright <Icon type="copyright" /> 2019 created by liuyang | Powered by .Net Core 2.2 on Linux
     </Fragment>
 );
 

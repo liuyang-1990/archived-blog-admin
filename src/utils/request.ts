@@ -41,7 +41,7 @@ const errorHandler = error => {
     });
 };
 
-let url = "http://localhost:49911/api/v1/";
+let url = "http://47.101.152.254:8081/api/v1/";
 if (process.env.NODE_ENV === "production") {
     url = "https://api.nayoung515.top/api/v1/";
 }

@@ -1,25 +1,37 @@
 import { injectable } from "inversify";
 import { observable, action } from "mobx";
 import { queryByPage, addUser, deleteUser, UpdateStatus, updateUser } from "@/services/user.service";
-import { TableListData } from "@/models/TableList";
+import { ITableListData } from "@/models/TableList";
 import { message } from 'antd';
+import { IUserTableListItem, IUserTableListParams } from "@/models/UserTableList";
+
 @injectable()
 export default class UserState {
 
     @observable loading: boolean = false;
-    @observable data!: TableListData;
+    @observable data!: ITableListData<IUserTableListItem>;
     @observable modalVisible: boolean = false;
 
     @action.bound
-    async queryByPage(params?: any) {
+    async queryByPage(params?: Partial<IUserTableListParams>) {
         this.loading = true;
         const response = await queryByPage(params);
         this.loading = false;
         if (response) {
+            let pageIndex = 1;
+            if (params && params.PageNum) {
+                pageIndex = params.PageNum;
+            }
+            response.Rows.forEach(i => {
+                if (i.UserName.toLowerCase() === "admin") {
+                    i.disabled = true;
+                }
+            });
             this.data = {
                 list: response.Rows,
                 pagination: {
                     total: response.TotalRows,
+                    current: pageIndex
                 }
             }
         }
@@ -46,7 +58,7 @@ export default class UserState {
     }
 
 
-    async deleteUser(id) {
+    async deleteUser(id: number) {
         const response = await deleteUser(id);
         if (response) {
             switch (response.Status) {
@@ -75,7 +87,6 @@ export default class UserState {
                     message.error('更新失败');
                     break;
             }
-
         }
     }
 
