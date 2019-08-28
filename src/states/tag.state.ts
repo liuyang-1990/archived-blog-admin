@@ -1,27 +1,33 @@
 import { injectable } from "inversify";
 import { observable, action } from "mobx";
-import { TableListData } from "@/models/TableList";
 import { queryByPage, updateTag, addTag, deleteTag } from "@/services/tag.service";
 import { message } from "antd";
+import { ITableListData } from "@/models/TableList";
+import { ITagTableListItem, IUserTableListParams } from "@/models/TagTableList";
 
 @injectable()
 export default class TagState {
 
     @observable loading: boolean = false;
-    @observable data!: TableListData;
+    @observable data!: ITableListData<ITagTableListItem>;;
 
     @action.bound
-    async queryByPage(params?: any) {
+    async queryByPage(params?: Partial<IUserTableListParams>) {
         this.loading = true;
         const response = await queryByPage(params);
         this.loading = false;
         if (response) {
+            let pageIndex = 1;
+            if (params && params.PageNum) {
+                pageIndex = params.PageNum;
+            }
             this.data = {
                 list: response.Rows,
                 pagination: {
                     total: response.TotalRows,
+                    current: pageIndex
                 }
-            }
+            };
         }
     }
 
