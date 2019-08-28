@@ -58,14 +58,14 @@ export default {
           ]
         },
         {
-          name: '系统管理',
+          name: '系统页',
           icon: 'setting',
           path: '/system',
           routes: [
             {
               path: '/system/user',
               name: '用户管理',
-              component: './SystemManagement/UserManagement',
+              component: './SystemManagement/UserInfo',
             },
           ]
         },

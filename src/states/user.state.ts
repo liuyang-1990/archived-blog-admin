@@ -33,12 +33,13 @@ export default class UserState {
                     total: response.TotalRows,
                     current: pageIndex
                 }
-            }
+            };
         }
     }
 
+    //新增或者更新用户信息
     @action.bound
-    async addUser(params, callback?) {
+    async handleOk(params: Partial<IUserTableListItem>, callback?: () => void) {
         const response = params.Id ? await updateUser(params) : await addUser(params);
         if (response) {
             switch (response.Status) {
@@ -57,7 +58,7 @@ export default class UserState {
         }
     }
 
-
+    @action.bound
     async deleteUser(id: number) {
         const response = await deleteUser(id);
         if (response) {
@@ -75,7 +76,7 @@ export default class UserState {
     }
     //批量改变用户状态（启用，禁用）
     @action.bound
-    async UpdateStatus(params) {
+    async UpdateStatus(params: { Ids: Array<number>, Status: number }) {
         const response = await UpdateStatus(params);
         if (response) {
             switch (response.Status) {

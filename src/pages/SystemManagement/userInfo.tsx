@@ -47,11 +47,10 @@ interface IUserInfoState {
 }
 
 @observer
-class UserManagement extends Component<IUserInfoProps, IUserInfoState> {
+class UserInfo extends Component<IUserInfoProps, IUserInfoState> {
 
     @lazyInject('UserState')
     private store!: UserState;
-    private formRef: any;
 
     constructor(props: IUserInfoProps) {
         super(props);
@@ -230,11 +229,8 @@ class UserManagement extends Component<IUserInfoProps, IUserInfoState> {
         );
     }
 
-    handleOk = async (params) => {
-        await this.store.addUser(params, () => {
-            this.formRef.props.form.resetFields();
-            this.handleModalVisible();
-        });
+    handleOk = async (params: Partial<IUserTableListItem>, callback?: () => void) => {
+        await this.store.handleOk(params, callback);
     }
 
     handleModalVisible = (flag?: boolean, record?: Partial<IUserTableListItem>) => {
@@ -257,11 +253,6 @@ class UserManagement extends Component<IUserInfoProps, IUserInfoState> {
                 <Menu.Item key="update">批量{enableShow ? '启用' : '禁用'}</Menu.Item>
             </Menu>
         );
-
-        const parentMethods = {
-            handleOk: this.handleOk,
-            handleModalVisible: this.handleModalVisible,
-        };
         return (
             <PageHeaderWrapper>
                 <Card bordered={false}>
@@ -296,8 +287,8 @@ class UserManagement extends Component<IUserInfoProps, IUserInfoState> {
                 {modalFormValues && Object.keys(modalFormValues).length ?
                     <CreateForm
                         key={modalFormValues.Id}
-                        wrappedComponentRef={inst => this.formRef = inst}
-                        {...parentMethods}
+                        handleOk={this.handleOk}
+                        handleModalVisible={this.handleModalVisible}
                         modalVisible={modalVisible}
                         values={modalFormValues}
                     /> : null}
@@ -305,4 +296,4 @@ class UserManagement extends Component<IUserInfoProps, IUserInfoState> {
         );
     }
 }
-export default Form.create<any>()(UserManagement);
+export default Form.create<any>()(UserInfo);

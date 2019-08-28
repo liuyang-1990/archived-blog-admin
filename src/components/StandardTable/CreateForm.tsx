@@ -8,7 +8,7 @@ const Option = Select.Option;
 
 interface ICreateFormProps extends FormComponentProps {
     modalVisible: boolean;
-    handleOk: (fieldsValue: Partial<IUserTableListItem>) => void;
+    handleOk: (fieldsValue: Partial<IUserTableListItem>, callback?: () => void) => void;
     handleModalVisible: (flag?: boolean, formVals?: Partial<IUserTableListItem>) => void;
     values: Partial<IUserTableListItem>;
 }
@@ -26,14 +26,16 @@ class CreateForm extends React.Component<ICreateFormProps, any>{
         }
     }
     render() {
-
         const { modalVisible, form, handleOk, handleModalVisible, values } = this.props;
         const { formVals: oldValue } = this.state;
         const okHandle = () => {
             form.validateFields((err, fieldsValue) => {
                 if (err) return;
                 const formVals = { ...oldValue, ...fieldsValue };
-                handleOk(formVals);
+                handleOk(formVals, () => {
+                    form.resetFields();
+                    handleModalVisible();
+                });
             });
         };
         return (
