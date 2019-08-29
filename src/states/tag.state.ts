@@ -3,7 +3,7 @@ import { observable, action } from "mobx";
 import { queryByPage, updateTag, addTag, deleteTag } from "@/services/tag.service";
 import { message } from "antd";
 import { ITableListData } from "@/models/TableList";
-import { ITagTableListItem, IUserTableListParams } from "@/models/TagTableList";
+import { ITagTableListItem, ITagTableListParams } from "@/models/TagTableList";
 
 @injectable()
 export default class TagState {
@@ -12,7 +12,7 @@ export default class TagState {
     @observable data!: ITableListData<ITagTableListItem>;;
 
     @action.bound
-    async queryByPage(params?: Partial<IUserTableListParams>) {
+    async queryByPage(params?: Partial<ITagTableListParams>) {
         this.loading = true;
         const response = await queryByPage(params);
         this.loading = false;
@@ -21,6 +21,9 @@ export default class TagState {
             if (params && params.PageNum) {
                 pageIndex = params.PageNum;
             }
+            response.Rows.forEach(i => {
+                i.key = i.Id.toString()
+            });
             this.data = {
                 list: response.Rows,
                 pagination: {
@@ -32,7 +35,7 @@ export default class TagState {
     }
 
     @action.bound
-    async addTag(params, callback?) {
+    async handleOk(params, callback?) {
         const response = params.Id ? await updateTag(params) : await addTag(params);
         if (response) {
             switch (response.Status) {
@@ -51,7 +54,7 @@ export default class TagState {
         }
     }
 
-
+    @action.bound
     async deleteTag(id: number) {
         const response = await deleteTag(id);
         if (response) {

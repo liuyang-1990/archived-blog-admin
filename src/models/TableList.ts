@@ -1,6 +1,9 @@
 export interface ITableListItem {
   Id: number,
-  disabled?: boolean,
+  key: string,
+  isNew?: boolean;
+  editable?: boolean;
+  disabled?: boolean;
 }
 
 export interface ITableListPagination {

@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { observer } from 'mobx-react';
-import { Form, Card, Button, Row, Col, Input, Divider, Popconfirm, } from 'antd';
+import { Form, Card, Button, Row, Col, Input } from 'antd';
 import { lazyInject } from '@/utils/ioc';
 import TagState from '@/states/tag.state';
 import styles from '../SystemManagement/style.less';
-import StandardTable, { StandardTableColumnProps } from '@/components/StandardTable';
 import { toLocaleTimeString } from '@/utils/utils';
 import { FormComponentProps } from 'antd/lib/form';
 import { ITableListPagination } from '@/models/TableList';
 import { SorterResult } from 'antd/lib/table';
 import { ITagTableListItem, ITagTableListParams } from '@/models/TagTableList';
+
+import TableForm from '@/components/EditableCell/TableForm';
 
 const FormItem = Form.Item;
 const getValue = (obj: { [x: string]: string[] }) =>
@@ -28,55 +29,48 @@ class TagInfo extends Component<ITagInfoProps, any> {
     @lazyInject('TagState')
     private store!: TagState;
 
+    clickedCancel: boolean = false;
+    index = 0;
+    cacheOriginData = {};
+
     constructor(props: ITagInfoProps) {
         super(props);
         this.state = {
             selectedRows: [],
-            editingKey: '',
+            data: [],
+            editingKey: ''
         }
     }
     componentDidMount() {
         this.store.queryByPage();
     }
 
-   // const EditableContext = React.createContext({});
-
-    columns: any = [{
-        title: '标签名称',
-        align: 'center',
-        dataIndex: 'TagName',
-        width: '25%',
-        editable: true,
-    }, {
-        title: '描述',
-        align: 'center',
-        dataIndex: 'Description',
-        width: '25%',
-        editable: true,
-    }, {
-        title: '创建时间',
-        align: 'center',
-        dataIndex: 'CreateTime',
-        render: createTime => toLocaleTimeString(createTime)
-    }, {
-        title: '操作',
-        align: 'center',
-        dataIndex: '',
-        key: 'x',
-        render: (text, record) => {
-            const { editingKey } = this.state;
-            const editable = this.isEditing(record);
-            <React.Fragment>
-                <a>编辑</a>
-                <Divider type="vertical" />
-                <Popconfirm title="是否要删除此行？">
-                    <a>删除</a>
-                </Popconfirm>
-            </React.Fragment>
-        }
-    }];
-
-    isEditing = record => record.key === this.state.editingKey;
+    columns: any = [
+        {
+            title: '标签名称',
+            align: 'center',
+            dataIndex: 'TagName',
+            key: 'TagName',
+            width: '25%',
+            editable: true,
+        }, {
+            title: '描述',
+            align: 'center',
+            dataIndex: 'Description',
+            key: 'Description',
+            width: '25%',
+            editable: true,
+        }, {
+            title: '创建时间',
+            align: 'center',
+            dataIndex: 'CreateTime',
+            render: createTime => toLocaleTimeString(createTime)
+        }, {
+            title: '操作',
+            align: 'center',
+            dataIndex: '',
+            key: 'x',
+        }];
 
     handleSelectRows = (rows: ITagTableListItem[]) => {
         this.setState({
@@ -136,19 +130,16 @@ class TagInfo extends Component<ITagInfoProps, any> {
         this.store.queryByPage(params);
     }
 
-    toggleEdit = () => {
-        const editing = !this.state.editing;
-        this.setState({ editing }, () => {
-            // if (editing) {
-            //     this.input.focus();
-            // }
-        });
+    handleOk = (value) => {
+        this.store.handleOk(value);
+    }
+    handleRemove = (key) => {
+        this.store.deleteTag(key);
     }
     render() {
         const {
             form: { getFieldDecorator },
         } = this.props;
-        const { selectedRows } = this.state;
         return (
             <PageHeaderWrapper>
                 <Card bordered={false}>
@@ -172,22 +163,29 @@ class TagInfo extends Component<ITagInfoProps, any> {
                                         </Button>
                                     </div>
                                 </div>
-
                             </Form>
                         </div>
-                        <div className={styles.tableListOperator}>
-                            <Button type="primary">
-                                新建
-                            </Button>
-                        </div>
-                        <StandardTable
-                            selectedRows={selectedRows}
-                            loading={this.store.loading}
-                            data={this.store.data}
-                            columns={this.columns}
-                            onSelectRow={this.handleSelectRows}
-                            onChange={this.handleTableChange}
-                        />
+
+                        {
+                            this.store.data && <TableForm
+                                value={this.store.data.list}
+                                onChange={this.handleOk}
+                                remove={this.handleRemove} />
+                        }
+
+                        {/* <EditableContext.Provider value={this.props.form}>
+                            <StandardTable
+                                components={components}
+                                selectedRows={selectedRows}
+                                loading={this.store.loading}
+                                data={this.store.data}
+                                columns={columns}
+                                //rowClassName='editable-row'
+                                onSelectRow={this.handleSelectRows}
+                                onChange={this.handleTableChange}
+                            />
+                        </EditableContext.Provider> */}
+
                     </div>
                 </Card>
             </PageHeaderWrapper>
