@@ -1,6 +1,6 @@
-import { Table } from 'antd';
+import { Table, Alert } from 'antd';
 import { ColumnProps, TableRowSelection, TableProps } from 'antd/es/table';
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import styles from './index.less';
 import { ITableListItem } from '@/models/TableList';
 
@@ -99,7 +99,7 @@ class StandardTable<T extends ITableListItem> extends Component<StandardTablePro
   };
 
   render() {
-    const { selectedRowKeys } = this.state;
+    const { selectedRowKeys,needTotalList  } = this.state;
     const { data, rowKey, ...rest } = this.props;
     const { list = [], pagination = false } = data || {};
     const paginationProps = pagination
@@ -115,12 +115,37 @@ class StandardTable<T extends ITableListItem> extends Component<StandardTablePro
       selectedRowKeys,
       onChange: this.handleRowSelectChange,
       getCheckboxProps: (record: T) => ({
-        disabled: record.disabled  //record.UserName === "admin",
+        disabled: record.disabled
       }),
     };
 
     return (
       <div className={styles.standardTable}>
+        <div className={styles.tableAlert}>
+          <Alert
+            message={
+              <Fragment>
+                已选择 <a style={{ fontWeight: 600 }}>{selectedRowKeys.length}</a> 项&nbsp;&nbsp;
+                {needTotalList.map((item, index) => (
+                  <span style={{ marginLeft: 8 }} key={item.dataIndex}>
+                    {item.title}
+                    总计&nbsp;
+                    <span style={{ fontWeight: 600 }}>
+                      {item.render
+                        ? item.render(item.total, item as T, index)
+                        : item.total}
+                    </span>
+                  </span>
+                ))}
+                <a onClick={this.cleanSelectedKeys} style={{ marginLeft: 24 }}>
+                  清空
+                </a>
+              </Fragment>
+            }
+            type="info"
+            showIcon
+          />
+        </div>
         <Table
           rowKey={rowKey || 'Id'}
           rowSelection={rowSelection}
