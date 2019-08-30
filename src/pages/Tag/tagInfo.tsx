@@ -5,7 +5,6 @@ import { Form, Card, Button, Row, Col, Input } from 'antd';
 import { lazyInject } from '@/utils/ioc';
 import TagState from '@/states/tag.state';
 import styles from '../SystemManagement/style.less';
-import { toLocaleTimeString } from '@/utils/utils';
 import { FormComponentProps } from 'antd/lib/form';
 import { ITableListPagination } from '@/models/TableList';
 import { SorterResult } from 'antd/lib/table';
@@ -29,14 +28,9 @@ class TagInfo extends Component<ITagInfoProps, any> {
     @lazyInject('TagState')
     private store!: TagState;
 
-    clickedCancel: boolean = false;
-    index = 0;
-    cacheOriginData = {};
-
     constructor(props: ITagInfoProps) {
         super(props);
         this.state = {
-            selectedRows: [],
             data: [],
             editingKey: ''
         }
@@ -44,39 +38,6 @@ class TagInfo extends Component<ITagInfoProps, any> {
     componentDidMount() {
         this.store.queryByPage();
     }
-
-    columns: any = [
-        {
-            title: '标签名称',
-            align: 'center',
-            dataIndex: 'TagName',
-            key: 'TagName',
-            width: '25%',
-            editable: true,
-        }, {
-            title: '描述',
-            align: 'center',
-            dataIndex: 'Description',
-            key: 'Description',
-            width: '25%',
-            editable: true,
-        }, {
-            title: '创建时间',
-            align: 'center',
-            dataIndex: 'CreateTime',
-            render: createTime => toLocaleTimeString(createTime)
-        }, {
-            title: '操作',
-            align: 'center',
-            dataIndex: '',
-            key: 'x',
-        }];
-
-    handleSelectRows = (rows: ITagTableListItem[]) => {
-        this.setState({
-            selectedRows: rows,
-        });
-    };
     //搜索
     handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -84,9 +45,6 @@ class TagInfo extends Component<ITagInfoProps, any> {
         form.validateFields((err, fieldsValue) => {
             if (err) return;
             const values = { ...fieldsValue };
-            // this.setState({
-            //     formValues: values,
-            // });
             this.store.queryByPage(values);
         });
     }
@@ -165,27 +123,13 @@ class TagInfo extends Component<ITagInfoProps, any> {
                                 </div>
                             </Form>
                         </div>
-
                         {
                             this.store.data && <TableForm
                                 value={this.store.data.list}
-                                onChange={this.handleOk}
-                                remove={this.handleRemove} />
+                                handleOk={this.handleOk}
+                                remove={this.handleRemove}
+                                onChange={this.handleTableChange} />
                         }
-
-                        {/* <EditableContext.Provider value={this.props.form}>
-                            <StandardTable
-                                components={components}
-                                selectedRows={selectedRows}
-                                loading={this.store.loading}
-                                data={this.store.data}
-                                columns={columns}
-                                //rowClassName='editable-row'
-                                onSelectRow={this.handleSelectRows}
-                                onChange={this.handleTableChange}
-                            />
-                        </EditableContext.Provider> */}
-
                     </div>
                 </Card>
             </PageHeaderWrapper>

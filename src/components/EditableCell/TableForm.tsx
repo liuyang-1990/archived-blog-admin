@@ -4,6 +4,7 @@ import React, { Fragment, PureComponent } from 'react';
 import isEqual from 'lodash.isequal';
 import styles from './style.less';
 import { toLocaleTimeString } from '@/utils/utils';
+import { TableProps } from 'antd/lib/table';
 
 interface TableFormDateType {
   key: string;
@@ -13,17 +14,18 @@ interface TableFormDateType {
   isNew?: boolean;
   editable?: boolean;
 }
-interface TableFormProps {
+interface TableFormProps extends TableProps<any> {
   loading?: boolean;
   value?: TableFormDateType[];
-  onChange?: (value?: TableFormDateType) => void;
   remove?: (key: string) => void;
+  handleOk?: (value?: TableFormDateType) => void;
 }
 
 interface TableFormState {
   loading?: boolean;
   value?: TableFormDateType[];
   data?: TableFormDateType[];
+  editingKey: string;
 }
 class TableForm extends PureComponent<TableFormProps, TableFormState> {
   static getDerivedStateFromProps(nextProps: TableFormProps, preState: TableFormState) {
@@ -33,6 +35,7 @@ class TableForm extends PureComponent<TableFormProps, TableFormState> {
     return {
       data: nextProps.value,
       value: nextProps.value,
+      loading: nextProps.loading,
     };
   }
 
@@ -94,7 +97,7 @@ class TableForm extends PureComponent<TableFormProps, TableFormState> {
       title: '操作',
       key: 'action',
       render: (text: string, record: TableFormDateType) => {
-        const { loading } = this.state;
+        const { loading, editingKey } = this.state;
         if (!!record.editable && loading) {
           return null;
         }
@@ -120,7 +123,7 @@ class TableForm extends PureComponent<TableFormProps, TableFormState> {
         }
         return (
           <span>
-            <a onClick={e => this.toggleEditable(e, record.key)}>编辑</a>
+            <a disabled={editingKey != ''} onClick={e => this.toggleEditable(e, record.key)}>编辑</a>
             <Divider type="vertical" />
             <Popconfirm title="是否要删除此行？" onConfirm={() => this.remove(record.key)}>
               <a>删除</a>
@@ -137,6 +140,7 @@ class TableForm extends PureComponent<TableFormProps, TableFormState> {
       data: props.value,
       loading: false,
       value: props.value,
+      editingKey: '',
     };
   }
 
@@ -150,6 +154,7 @@ class TableForm extends PureComponent<TableFormProps, TableFormState> {
     const { data = [] } = this.state;
     const newData = data.map(item => ({ ...item }));
     const target = this.getRowByKey(key, newData);
+    this.setState({ editingKey: key });
     if (target) {
       // 进入编辑状态时保存原始数据
       if (!target.editable) {
@@ -167,7 +172,6 @@ class TableForm extends PureComponent<TableFormProps, TableFormState> {
       key: `NEW_TEMP_ID_${this.index}`,
       TagName: '',
       Description: '',
-      // CreateTime: new Date().toLocaleString(),
       editable: true,
       isNew: true,
     });
@@ -226,13 +230,14 @@ class TableForm extends PureComponent<TableFormProps, TableFormState> {
       delete target.isNew;
       this.toggleEditable(e, key);
       const { data = [] } = this.state;
-      const { onChange } = this.props;
-      if (onChange) {
+      const { handleOk } = this.props;
+      if (handleOk) {
         const row = data.find(x => { return x.key == key });
-        onChange(row);
+        handleOk(row);
       }
       this.setState({
         loading: false,
+        editingKey: ''
       });
     }, 500);
   }
@@ -257,9 +262,20 @@ class TableForm extends PureComponent<TableFormProps, TableFormState> {
       }
       return item;
     });
-
-    this.setState({ data: cacheOriginData });
+    this.setState({ data: cacheOriginData, editingKey: '' });
     this.clickedCancel = false;
+  }
+
+  handleTableChange: TableProps<TableFormDateType>['onChange'] = (
+    pagination,
+    filters,
+    sorter,
+    ...rest
+  ) => {
+    const { onChange } = this.props;
+    if (onChange) {
+      onChange(pagination, filters, sorter, ...rest);
+    }
   }
 
   render() {
@@ -267,18 +283,25 @@ class TableForm extends PureComponent<TableFormProps, TableFormState> {
 
     return (
       <Fragment>
-        <div className={styles.tableListOperator}>
-          <Button type="primary" onClick={this.newTag}>
-            新建
-          </Button>
-        </div>
+        <Button
+          style={{ marginBottom: 16 }}
+          type="primary"
+          onClick={this.newTag}
+        >
+          新建
+        </Button>
         <Table<TableFormDateType>
           loading={loading}
           columns={this.columns}
+          pagination={{
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+          }}
+          onChange={this.handleTableChange}
           dataSource={data}
           rowClassName={record => (record.editable ? styles.editable : '')}
         />
-
       </Fragment>
     );
   }
