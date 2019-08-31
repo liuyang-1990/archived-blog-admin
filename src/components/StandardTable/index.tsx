@@ -12,8 +12,8 @@ export interface StandardTableProps<T extends ITableListItem> extends Omit<Table
     list: T[];
     pagination: StandardTableProps<T>['pagination'];
   };
-  selectedRows: T[];
-  onSelectRow: (rows: any) => void;
+  selectedRows?: T[];
+  onSelectRow?: (rows: any) => void;
 }
 
 export interface StandardTableColumnProps<T extends ITableListItem> extends ColumnProps<T> {
@@ -42,7 +42,7 @@ interface StandardTableState<T extends ITableListItem> {
 class StandardTable<T extends ITableListItem> extends Component<StandardTableProps<T>, StandardTableState<T>> {
   static getDerivedStateFromProps(nextProps: StandardTableProps<ITableListItem>) {
     // clean state
-    if (nextProps.selectedRows.length === 0) {
+    if (nextProps.selectedRows && nextProps.selectedRows.length === 0) {
       const needTotalList = initTotalList(nextProps.columns);
       return {
         selectedRowKeys: [],
@@ -99,7 +99,7 @@ class StandardTable<T extends ITableListItem> extends Component<StandardTablePro
   };
 
   render() {
-    const { selectedRowKeys,needTotalList  } = this.state;
+    const { selectedRowKeys, needTotalList } = this.state;
     const { data, rowKey, ...rest } = this.props;
     const { list = [], pagination = false } = data || {};
     const paginationProps = pagination

@@ -1,8 +1,8 @@
 import request from "@/utils/request";
 import { IResultModel, IJsonResultModel } from "@/models/TableList";
-import { ITagTableListItem, IUserTableListParams } from "@/models/TagTableList";
+import { ITagTableListItem, ITagTableListParams } from "@/models/TagTableList";
 
-export async function queryByPage(params?: Partial<IUserTableListParams>): Promise<IJsonResultModel<ITagTableListItem>> {
+export async function queryByPage(params?: Partial<ITagTableListParams>): Promise<IJsonResultModel<ITagTableListItem>> {
     return request('tag/page', {
         params: params
     });

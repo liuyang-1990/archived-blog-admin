@@ -45,9 +45,48 @@ export default {
       Routes: ['src/pages/Authorized'],
       authority: ['admin', 'user'],
       routes: [
+        { path: '/', redirect: '/dashboard/workplace' },
         {
-          name: '标签页',
-          icon: 'tag',
+          name: 'Dashboard',
+          icon: 'dashboard',
+          path: '/dashboard',
+          routes: [
+            {
+              path: '/dashboard/workplace',
+              name: '工作台',
+            },
+          ]
+        },
+        {
+          name: '文章',
+          icon: 'file-markdown',
+          path: '/article',
+          routes: [
+            {
+              path: '/article/list',
+              name: '文章列表'
+            },
+            {
+              path: '/article/add',
+              name: '发文'
+            },
+          ]
+        },
+        {
+          name: '分类',
+          icon: 'book',
+          path: '/category',
+          routes: [
+            {
+              path: '/category/list',
+              name: '分类列表',
+              component: './Category/CategoryInfo',
+            },
+          ]
+        },
+        {
+          name: '标签',
+          icon: 'tags',
           path: '/tag',
           routes: [
             {
@@ -84,6 +123,21 @@ export default {
               name: '500',
               component: './exception/500',
             },
+          ]
+        },
+        {
+          name: '个人页',
+          icon: 'user',
+          path: '/account',
+          routes:[
+            {
+              path: '/account/center',
+              name: '个人中心',
+            },
+            {
+              path: '/account/settings',
+              name: '个人设置',
+            }
           ]
         },
         {
