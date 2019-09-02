@@ -67,8 +67,9 @@ export default {
               name: '文章列表'
             },
             {
-              path: '/article/add',
-              name: '发文'
+              path: '/article/post',
+              name: '发文',
+              component: './Article/PostArticle',
             },
           ]
         },
