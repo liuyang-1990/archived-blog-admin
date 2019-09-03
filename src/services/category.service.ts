@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 import { IResultModel, IJsonResultModel } from "@/models/TableList";
-import { ICategoryTableListItem, ICategoryTableListParams } from "@/models/categoryTableList";
+import { ICategoryTableListItem, ICategoryTableListParams } from "@/models/CategoryTableList";
 
 
 export async function queryByPage(params?: Partial<ICategoryTableListParams>): Promise<IJsonResultModel<ICategoryTableListItem>> {

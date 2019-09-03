@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 import { observable, action } from "mobx";
 import { message } from "antd";
 import { ITableListData } from "@/models/TableList";
-import { ICategoryTableListItem, ICategoryTableListParams } from "@/models/categoryTableList";
+import { ICategoryTableListItem, ICategoryTableListParams } from "@/models/CategoryTableList";
 import { queryByPage, updateCategory, addCategory, deleteCategory } from "@/services/category.service";
 
 
