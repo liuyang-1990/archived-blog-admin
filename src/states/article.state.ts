@@ -16,14 +16,11 @@ interface ICategoryInfo {
 @injectable()
 export default class ArticleState {
 
-    @observable tagLoading: boolean = false;
-    @observable categoryLoading: boolean = false;
     @observable tags: Array<ITagInfo> = [];
     @observable categories: Array<ICategoryInfo> = [];
 
     @action.bound
     async queryAllTags() {
-        this.tagLoading = true;
         const response = await getAllTags();
         this.tags = response.map(x => {
             return {
@@ -31,15 +28,17 @@ export default class ArticleState {
                 TagName: x.TagName
             }
         });
-        this.tagLoading = false;
     }
 
     @action.bound
     async queryAllCategories() {
-        this.categoryLoading = true;
         const response = await getAllCategories();
-        this.categoryLoading = false;
-        return response;
+        this.categories = response.map(x => {
+            return {
+                Id: x.Id,
+                CategoryName: x.CategoryName
+            }
+        });
     }
 
 }

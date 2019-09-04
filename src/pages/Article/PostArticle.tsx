@@ -41,7 +41,7 @@ class PostArticle extends React.Component<any, any>{
             editorState: BraftEditor.createEditorState(null),
             previewVisible: false,
             previewImage: '',
-            imageUrl: '',
+            imageUrl: ''
         };
     }
 
@@ -49,15 +49,9 @@ class PostArticle extends React.Component<any, any>{
         this.store.queryAllTags();
         this.store.queryAllCategories();
     }
-    // componentDidMount() {
-    //     BraftEditor.use([Table, Markdown, HeaderId, MaxLength({
-    //         defaultValue: 5000
-    //     })]);
-
-    // }
 
     handleEditorChange = (editorState) => {
-        this.setState({ editorState })
+        this.setState({ editorState });
     }
 
     handleChange = info => {
@@ -79,14 +73,17 @@ class PostArticle extends React.Component<any, any>{
     formOnSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         this.props.form.validateFields((err, fieldsValue) => {
-            console.log(fieldsValue);
-
+            if (err) {
+                return;
+            }
+            const { editorState, imageUrl } = this.state;
+            const html = editorState.toHTML();
+            const values = Object.assign(fieldsValue, {
+                Content: html,
+                ImageUrl: imageUrl
+            });
+            console.log(values);
         });
-    }
-
-
-    handleSelectChange = (value) => {
-        console.log(`selected ${value}`);
     }
 
     render() {
@@ -98,11 +95,6 @@ class PostArticle extends React.Component<any, any>{
                 <Option value="0">转载</Option>
             </Select>
         );
-        const children: Array<any> = [];
-        for (let i = 10; i < 36; i++) {
-            children.push(<Option key={i.toString(36) + i}>{i.toString(36) + i}</Option>);
-        }
-
         const uploadButton = (
             <div>
                 <Icon type={this.state.loading ? 'loading' : 'plus'} />
@@ -120,46 +112,48 @@ class PostArticle extends React.Component<any, any>{
                                 <Input
                                     size="large"
                                     addonBefore={selectBefore}
-                                    placeholder="请输入标题"
+                                    placeholder="标题"
                                     maxLength={200}
                                 />
                             )}
                         </FormItem>
                         <FormItem label="分类">
                             {
-                                getFieldDecorator('category')(
+                                getFieldDecorator('Category')(
                                     <Select
                                         mode="multiple"
                                         style={{ width: '100%' }}
                                         placeholder="分类"
                                         showArrow
-                                        labelInValue
-                                        onChange={this.handleSelectChange}
                                         tokenSeparators={[',']}
                                     >
                                         {
-                                            this.store.tags.map(x=>(
-                                                <Option key={x.Id}>{x.TagName}</Option>
+                                            this.store.categories.map(x => (
+                                                <Option key={x.Id}>{x.CategoryName}</Option>
                                             ))
                                         }
                                     </Select>)
                             }
                         </FormItem>
                         <FormItem label="标签">
-                            {getFieldDecorator('tag')(
+                            {getFieldDecorator('Tags')(
                                 <Select
                                     mode="tags"
                                     showArrow
                                     style={{ width: '100%' }}
                                     placeholder="标签"
                                 >
-                                    {children}
+                                    {
+                                        this.store.tags.map(x => (
+                                            <Option key={x.Id}>{x.TagName}</Option>
+                                        ))
+                                    }
                                 </Select>
                             )
                             }
                         </FormItem>
                         <FormItem label="内容">
-                            {getFieldDecorator('content', {
+                            {getFieldDecorator('Content', {
                                 validateTrigger: "onSubmit",
                                 rules: [{
                                     required: true,
@@ -175,7 +169,7 @@ class PostArticle extends React.Component<any, any>{
                                 <BraftEditor
                                     // media={{ uploadFn: this.uploadFn }}
                                     className={style.brafteditor}
-                                    //onChange={this.onChange}
+                                    onChange={this.handleEditorChange}
                                     placeholder="文章内容" />
                             )}
                         </FormItem>

@@ -7,7 +7,7 @@ import { lazyInject } from '@/utils/ioc';
 import CategoryState from '@/states/category.state';
 import StandardTable, { StandardTableColumnProps } from '@/components/StandardTable';
 import { toLocaleTimeString } from '@/utils/utils';
-import { ICategoryTableListItem, ICategoryTableListParams } from '@/models/categoryTableList';
+import { ICategoryTableListItem, ICategoryTableListParams } from '@/models/CategoryTableList';
 import { ITableListPagination } from '@/models/TableList';
 import { SorterResult } from 'antd/lib/table';
 import CategoryModalForm from './categoryModal';
