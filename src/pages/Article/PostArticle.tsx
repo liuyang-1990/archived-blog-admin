@@ -4,17 +4,19 @@ import Table from 'braft-extensions/dist/table';
 import Markdown from 'braft-extensions/dist/markdown';
 import MaxLength from 'braft-extensions/dist/max-length';
 import HeaderId from 'braft-extensions/dist/header-id';
-import { Form, Card, Input, Select, Button, Upload, Icon } from 'antd';
+import ColorPicker from 'braft-extensions/dist/color-picker';
+import { Form, Card, Input, Select, Button, Upload, Icon, message } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { lazyInject } from '@/utils/ioc';
 import { observer } from 'mobx-react';
 import ArticleState from '@/states/article.state';
-
+import style from './style.less';
 import 'braft-editor/dist/index.css';
 import 'braft-editor/dist/output.css';
 import 'braft-extensions/dist/table.css';
-import style from './style.less';
-
+import 'braft-extensions/dist/color-picker.css';
+import { RcFile } from 'antd/lib/upload';
+import ImageState from '@/states/image.state';
 
 function getBase64(img, callback) {
     const reader = new FileReader();
@@ -25,23 +27,35 @@ function getBase64(img, callback) {
 const FormItem = Form.Item;
 const Option = Select.Option;
 const TextArea = Input.TextArea;
-BraftEditor.use(Markdown);
-BraftEditor.use(MaxLength);
-BraftEditor.use(HeaderId);
-BraftEditor.use(Table);
+BraftEditor.use(Markdown());//使用markdown语法快捷输入内容
+BraftEditor.use(MaxLength());
+BraftEditor.use(HeaderId());//为标题区块(h1-h6)增加随机的id，便于在展示页支持锚点跳转功能
+BraftEditor.use(ColorPicker({
+    theme: 'light' // 指定取色器样式主题，支持dark和light两种样式
+}));
+BraftEditor.use(Table({
+    defaultColumns: 3, // 默认列数
+    defaultRows: 3, // 默认行数
+    withDropdown: false, // 插入表格前是否弹出下拉菜单
+    exportAttrString: '', // 指定输出HTML时附加到table标签上的属性字符串
+}));
 
 @observer
 class PostArticle extends React.Component<any, any>{
 
     @lazyInject('ArticleState')
     private store!: ArticleState;
+    @lazyInject('ImageState')
+    private imageStore!: ImageState;
+
     constructor(props) {
         super(props);
         this.state = {
             editorState: BraftEditor.createEditorState(null),
             previewVisible: false,
             previewImage: '',
-            imageUrl: ''
+            imageUrl: '',
+            status: 0,
         };
     }
 
@@ -52,6 +66,25 @@ class PostArticle extends React.Component<any, any>{
 
     handleEditorChange = (editorState) => {
         this.setState({ editorState });
+    }
+
+    //上传图片前，检验是否符合规则
+    beforeUpload = (file: RcFile, fileList: RcFile[]) => {
+        const isImage = file.type.startsWith("image/");
+        if (!isImage) {
+            message.error('请上传图片!');
+            return false;
+        }
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+            message.error('图片超过2M了!');
+            return false;
+        }
+        return true;
+    }
+
+    customRequest = (param) => {
+        this.imageStore.uploadIamge(param.file, param.onProgress, param.onSuccess, param.onError);
     }
 
     handleChange = info => {
@@ -76,11 +109,12 @@ class PostArticle extends React.Component<any, any>{
             if (err) {
                 return;
             }
-            const { editorState, imageUrl } = this.state;
+            const { editorState, imageUrl, status } = this.state;
             const html = editorState.toHTML();
             const values = Object.assign(fieldsValue, {
                 Content: html,
-                ImageUrl: imageUrl
+                ImageUrl: imageUrl,
+                Status: status
             });
             console.log(values);
         });
@@ -88,7 +122,7 @@ class PostArticle extends React.Component<any, any>{
 
     render() {
         const { getFieldDecorator } = this.props.form;
-        const { editorState, imageUrl } = this.state;
+        const { imageUrl } = this.state;
         const selectBefore = getFieldDecorator('IsOriginal', { initialValue: "1" })(
             <Select style={{ width: 70 }}>
                 <Option value="1">原创</Option>
@@ -154,7 +188,7 @@ class PostArticle extends React.Component<any, any>{
                         </FormItem>
                         <FormItem label="内容">
                             {getFieldDecorator('Content', {
-                                validateTrigger: "onSubmit",
+                                validateTrigger: "onBlur",
                                 rules: [{
                                     required: true,
                                     validator: (_, value, callback) => {
@@ -185,8 +219,9 @@ class PostArticle extends React.Component<any, any>{
                                         name="ImageUrl"
                                         listType="picture-card"
                                         showUploadList={false}
-                                        className="uploader"
-                                        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                        className={style.uploader}
+                                        beforeUpload={this.beforeUpload}
+                                        customRequest={this.customRequest}
                                         onChange={this.handleChange}
                                     >
                                         {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
@@ -197,12 +232,14 @@ class PostArticle extends React.Component<any, any>{
                         </FormItem>
                         <FormItem>
                             <Button
+                                onClick={() => this.setState({ status: 1 })}
                                 type="primary"
                                 style={{ width: 80 }}
                                 htmlType="submit">
                                 发表文章
                             </Button>
                             <Button style={{ marginLeft: 8, width: 80 }}
+                                onClick={() => this.setState({ status: 0 })}
                                 type="primary"
                                 htmlType="submit">
                                 存为草稿

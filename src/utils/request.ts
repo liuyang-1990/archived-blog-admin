@@ -36,7 +36,7 @@ const errorHandler = error => {
         notification.error({ message: error.message });
         return;
     }
-    if(status==401){
+    if (status == 401) {
         router.push('/login');
         return;
     }
@@ -53,8 +53,7 @@ if (process.env.NODE_ENV === "production") {
 
 const request = extend({
     headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        'Accept': 'application/json'
     },
     errorHandler, // 默认错误处理
     credentials: 'include', // 默认请求是否带上cookie,
@@ -66,6 +65,11 @@ const request = extend({
 request.interceptors.request.use((url, options) => {
     let token = localStorage.getItem("x-access-token");
     let headers = { ...options.headers };
+    if (url.indexOf("image") == -1) {
+        headers = Object.assign(headers, {
+            'Content-Type': 'application/json'
+        });
+    }
     if (token) {
         const addheaders = {
             'x-refresh-token': localStorage.getItem('x-refresh-token'),
