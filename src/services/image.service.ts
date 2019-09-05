@@ -1,7 +1,10 @@
 import { userStorage } from "@/utils/user.storage";
 
 export function uploadIamge(file, progress, success, error) {
-    const serverURL = 'http://47.101.152.254:8081/api/v1/image/upload';
+    let serverURL = "http://localhost:49911/api/v1/image/upload";
+    if (process.env.NODE_ENV === "production") {
+        serverURL = "https://api.nayoung515.top/api/v1/image/upload";
+    }
     const xhr = new XMLHttpRequest();
     const fd = new FormData();
     const successFn = () =>

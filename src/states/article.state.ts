@@ -1,6 +1,9 @@
 import { injectable } from "inversify";
 import { observable, action } from "mobx";
-import { getAllTags, getAllCategories } from "@/services/article.service";
+import { getAllTags, getAllCategories, postArticle } from "@/services/article.service";
+import { message } from "antd";
+import router from 'umi/router';
+
 
 interface ITagInfo {
     Id: number;
@@ -39,5 +42,21 @@ export default class ArticleState {
                 CategoryName: x.CategoryName
             }
         });
+    }
+
+
+    async postArticle(params) {
+        const response = await postArticle(params);
+        if (response) {
+            switch (response.Status) {
+                case '0':
+                    message.success(`${params.Id ? '更新' : '添加'}成功`);
+                    router.push('/article/list');
+                    break;
+                case '1':
+                    message.error(`${params.Id ? '更新' : '添加'}失败`);
+                    break;
+            }
+        }
     }
 }

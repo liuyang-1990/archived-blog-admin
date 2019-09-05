@@ -6,23 +6,19 @@ import MaxLength from 'braft-extensions/dist/max-length';
 import HeaderId from 'braft-extensions/dist/header-id';
 import ColorPicker from 'braft-extensions/dist/color-picker';
 import { Form, Card, Input, Select, Button, Upload, Icon, message } from 'antd';
+import { RcFile, UploadChangeParam } from 'antd/lib/upload';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { lazyInject } from '@/utils/ioc';
 import { observer } from 'mobx-react';
 import ArticleState from '@/states/article.state';
+import ImageState from '@/states/image.state';
+import router from 'umi/router';
 import style from './style.less';
 import 'braft-editor/dist/index.css';
 import 'braft-editor/dist/output.css';
 import 'braft-extensions/dist/table.css';
 import 'braft-extensions/dist/color-picker.css';
-import { RcFile } from 'antd/lib/upload';
-import ImageState from '@/states/image.state';
 
-function getBase64(img, callback) {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => callback(reader.result));
-    reader.readAsDataURL(img);
-}
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -83,23 +79,26 @@ class PostArticle extends React.Component<any, any>{
         return true;
     }
 
-    customRequest = (param) => {
-        this.imageStore.uploadIamge(param.file, param.onProgress, param.onSuccess, param.onError);
+    //自定义上传
+    customRequest = (params) => {
+        this.imageStore.uploadIamge(params.file, params.onProgress, params.onSuccess, params.onError);
     }
 
-    handleChange = info => {
+    //BraftEditor  自定义上传
+    uploadFn = (params) => {
+        this.imageStore.uploadIamge(params.file, params.progress, params.success, params.error);
+    }
+
+    handleChange = (info: UploadChangeParam) => {
         if (info.file.status === 'uploading') {
             this.setState({ loading: true });
             return;
         }
         if (info.file.status === 'done') {
-            // Get this url from response in real world.
-            getBase64(info.file.originFileObj, imageUrl =>
-                this.setState({
-                    imageUrl,
-                    loading: false,
-                }),
-            );
+            this.setState({
+                imageUrl: info.file.response.url,
+                loading: false,
+            });
         }
     };
 
@@ -116,8 +115,12 @@ class PostArticle extends React.Component<any, any>{
                 ImageUrl: imageUrl,
                 Status: status
             });
-            //console.log(values);
+            this.store.postArticle(values);
         });
+    }
+
+    handleCancel = () => {
+        router.push('/article/list');
     }
 
     render() {
@@ -193,18 +196,18 @@ class PostArticle extends React.Component<any, any>{
                                     required: true,
                                     validator: (_, value, callback) => {
                                         if (value.isEmpty()) {
-                                            callback('请输入文章内容')
+                                            callback('请输入文章内容');
                                         } else {
-                                            callback()
+                                            callback();
                                         }
                                     }
                                 }]
                             })(
                                 <BraftEditor
-                                    // media={{ uploadFn: this.uploadFn }}
-                                    className={style.brafteditor}
+                                    media={{ uploadFn: this.uploadFn }}
+                                    className={style.editor}
                                     onChange={this.handleEditorChange}
-                                    placeholder="文章内容" 
+                                    placeholder="文章内容"
                                 />
                             )}
                         </FormItem>
@@ -214,22 +217,16 @@ class PostArticle extends React.Component<any, any>{
                             })(<TextArea placeholder="摘要" maxLength={500} style={{ resize: 'none' }} autosize={{ minRows: 2, maxRows: 6 }} />)}
                         </FormItem>
                         <FormItem label="封面图片">
-                            {
-                                getFieldDecorator('ImageUrl')(
-                                    <Upload
-                                        name="ImageUrl"
-                                        listType="picture-card"
-                                        showUploadList={false}
-                                        className={style.uploader}
-                                        beforeUpload={this.beforeUpload}
-                                        customRequest={this.customRequest}
-                                        onChange={this.handleChange}
-                                    >
-                                        {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
-                                    </Upload>
-                                )
-                            }
-
+                            <Upload
+                                listType="picture-card"
+                                showUploadList={false}
+                                className={style.coverUploader}
+                                beforeUpload={this.beforeUpload}
+                                customRequest={this.customRequest}
+                                onChange={this.handleChange}
+                            >
+                                {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+                            </Upload>
                         </FormItem>
                         <FormItem>
                             <Button
@@ -240,7 +237,7 @@ class PostArticle extends React.Component<any, any>{
                             >
                                 发表文章
                             </Button>
-                            <Button 
+                            <Button
                                 style={{ marginLeft: 8, width: 80 }}
                                 onClick={() => this.setState({ status: 0 })}
                                 type="primary"
@@ -248,9 +245,10 @@ class PostArticle extends React.Component<any, any>{
                             >
                                 存为草稿
                             </Button>
-                            <Button 
+                            <Button
                                 style={{ marginLeft: 8, width: 80 }}
                                 type="primary"
+                                onClick={this.handleCancel}
                             >
                                 取消
                             </Button>

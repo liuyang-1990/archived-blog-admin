@@ -10,3 +10,9 @@ export async function getAllCategories() {
     return request('category/all');
 }
 
+export async function postArticle(params) {
+    return request("article",{
+        method: 'POST',
+        data: params
+    });
+}
