@@ -22,7 +22,7 @@ export default class ArticleState {
     @action.bound
     async queryAllTags() {
         const response = await getAllTags();
-        this.tags = response.map(x => {
+        this.tags = response && response.map(x => {
             return {
                 Id: x.Id,
                 TagName: x.TagName
@@ -33,7 +33,7 @@ export default class ArticleState {
     @action.bound
     async queryAllCategories() {
         const response = await getAllCategories();
-        this.categories = response.map(x => {
+        this.categories = response && response.map(x => {
             return {
                 Id: x.Id,
                 CategoryName: x.CategoryName
