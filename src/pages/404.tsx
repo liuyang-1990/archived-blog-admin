@@ -10,9 +10,8 @@ const NoFoundPage: React.FC<{}> = () => (
     extra={
       <Button type="primary" onClick={() => router.push('/')}>
          回到首页
-      </Button>
-    }
-  ></Result>
+      </Button>}
+  />
 );
 
 export default NoFoundPage;

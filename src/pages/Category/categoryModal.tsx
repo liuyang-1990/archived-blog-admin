@@ -1,7 +1,7 @@
 import { Form, Input, Modal } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 import React from 'react';
-import { ICategoryTableListItem } from '@/models/categoryTableList';
+import { ICategoryTableListItem } from '@/models/CategoryTableList';
 
 const FormItem = Form.Item;
 interface ICategoryModalFormProps extends FormComponentProps {

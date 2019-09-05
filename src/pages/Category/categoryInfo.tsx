@@ -197,3 +197,4 @@ class CategoryInfo extends Component<any, any>{
 }
 
 export default Form.create<any>()(CategoryInfo);
+

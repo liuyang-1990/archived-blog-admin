@@ -117,12 +117,12 @@ export default {
             {
               path: '/exception/403',
               name: '403',
-              component: './exception/403',
+              component: './Exception/403',
             },
             {
               path: '/exception/500',
               name: '500',
-              component: './exception/500',
+              component: './Exception/500',
             },
           ]
         },

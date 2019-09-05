@@ -1,6 +1,6 @@
-import { Button, Result } from 'antd';
-import React from 'react';
-import router from 'umi/router';
+import { Button, Result } from '@/pages/Exception/node_modules/antd';
+import React from '@/pages/Exception/node_modules/react';
+import router from '@/pages/Exception/node_modules/umi/router';
 
 const Exception500: React.FC<{}> = () => (
   <Result
@@ -10,9 +10,8 @@ const Exception500: React.FC<{}> = () => (
     extra={
       <Button type="primary" onClick={() => router.push('/')}>
          回到首页
-      </Button>
-    }
-  ></Result>
+      </Button>}
+  />
 );
 
 export default Exception500;

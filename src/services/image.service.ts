@@ -9,7 +9,7 @@ export function uploadIamge(file, progress, success, error) {
     }).then(res => {
         success({ url: res.data.WebUrl }, file)
     }).catch(err => {
-        console.log(err);
+        //console.log(err);
         error({ msg: '上传失败!' });
     });
 

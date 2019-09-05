@@ -116,7 +116,7 @@ class PostArticle extends React.Component<any, any>{
                 ImageUrl: imageUrl,
                 Status: status
             });
-            console.log(values);
+            //console.log(values);
         });
     }
 
@@ -204,7 +204,8 @@ class PostArticle extends React.Component<any, any>{
                                     // media={{ uploadFn: this.uploadFn }}
                                     className={style.brafteditor}
                                     onChange={this.handleEditorChange}
-                                    placeholder="文章内容" />
+                                    placeholder="文章内容" 
+                                />
                             )}
                         </FormItem>
                         <FormItem label="摘要">
@@ -235,17 +236,22 @@ class PostArticle extends React.Component<any, any>{
                                 onClick={() => this.setState({ status: 1 })}
                                 type="primary"
                                 style={{ width: 80 }}
-                                htmlType="submit">
+                                htmlType="submit"
+                            >
                                 发表文章
                             </Button>
-                            <Button style={{ marginLeft: 8, width: 80 }}
+                            <Button 
+                                style={{ marginLeft: 8, width: 80 }}
                                 onClick={() => this.setState({ status: 0 })}
                                 type="primary"
-                                htmlType="submit">
+                                htmlType="submit"
+                            >
                                 存为草稿
                             </Button>
-                            <Button style={{ marginLeft: 8, width: 80 }}
-                                type="primary">
+                            <Button 
+                                style={{ marginLeft: 8, width: 80 }}
+                                type="primary"
+                            >
                                 取消
                             </Button>
                         </FormItem>

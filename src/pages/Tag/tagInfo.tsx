@@ -124,11 +124,13 @@ class TagInfo extends Component<ITagInfoProps, any> {
                             </Form>
                         </div>
                         {
-                            this.store.data && <TableForm
+                            this.store.data && 
+                            <TableForm
                                 value={this.store.data.list}
                                 handleOk={this.handleOk}
                                 remove={this.handleRemove}
-                                onChange={this.handleTableChange} />
+                                onChange={this.handleTableChange} 
+                            />
                         }
                     </div>
                 </Card>
