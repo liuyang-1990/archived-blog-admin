@@ -1,6 +1,6 @@
-import { Button, Result } from '@/pages/Exception/node_modules/antd';
-import React from '@/pages/Exception/node_modules/react';
-import router from '@/pages/Exception/node_modules/umi/router';
+import { Button, Result } from 'antd';
+import React from 'react';
+import router from 'umi/router';
 
 const Exception403: React.FC<{}> = () => (
   <Result
