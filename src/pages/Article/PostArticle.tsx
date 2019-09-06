@@ -108,10 +108,9 @@ class PostArticle extends React.Component<any, any>{
             if (err) {
                 return;
             }
-            const { editorState, imageUrl, status } = this.state;
-            const html = editorState.toHTML();
+            const { imageUrl, status } = this.state;
             const values = Object.assign(fieldsValue, {
-                Content: html,
+                Content: fieldsValue.Content.toHTML(),
                 ImageUrl: imageUrl,
                 Status: status
             });
@@ -156,7 +155,7 @@ class PostArticle extends React.Component<any, any>{
                         </FormItem>
                         <FormItem label="分类">
                             {
-                                getFieldDecorator('Category')(
+                                getFieldDecorator('Categories')(
                                     <Select
                                         mode="multiple"
                                         style={{ width: '100%' }}
@@ -165,7 +164,7 @@ class PostArticle extends React.Component<any, any>{
                                         tokenSeparators={[',']}
                                     >
                                         {
-                                            this.store.categories.map(x => (
+                                            this.store.categories && this.store.categories.map(x => (
                                                 <Option key={x.Id}>{x.CategoryName}</Option>
                                             ))
                                         }
@@ -181,7 +180,7 @@ class PostArticle extends React.Component<any, any>{
                                     placeholder="标签"
                                 >
                                     {
-                                        this.store.tags.map(x => (
+                                        this.store.tags && this.store.tags.map(x => (
                                             <Option key={x.Id}>{x.TagName}</Option>
                                         ))
                                     }
