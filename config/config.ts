@@ -64,7 +64,8 @@ export default {
           routes: [
             {
               path: '/article/list',
-              name: '文章列表'
+              name: '文章列表',
+              component:'./Article/ArticleList'
             },
             {
               path: '/article/post',
