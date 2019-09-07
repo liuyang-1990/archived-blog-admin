@@ -9,23 +9,61 @@ export interface IJwtModel {
 
 class UserStorage {
 
-    get AccessToken() {
-        return localStorage.getItem('x-access-token') ? localStorage.getItem('x-access-token')
-            : sessionStorage.getItem('x-access-token');
+    private _autoLogin!: boolean;
+    private _accessToken!: string | null;
+    private _refreshToken!: string | null;
+
+    get AutoLogin(): boolean {
+        return this._autoLogin;
     }
 
-    get RefreshToken() {
-        return localStorage.getItem('x-refresh-token') ? localStorage.getItem('x-refresh-token')
-            : sessionStorage.getItem('x-refresh-token');
+    set AutoLogin(autoLogin: boolean) {
+        this._autoLogin = autoLogin;
+    }
+
+
+    set AccessToken(token: string | null) {
+        this._accessToken = token;
+        if (token) {
+            if (this._autoLogin) {
+                localStorage.setItem('x-access-token', token);
+            } else {
+                sessionStorage.setItem('x-access-token', token);
+            }
+        }
+    }
+
+    get AccessToken(): string | null {
+        if (this._autoLogin) {
+            return localStorage.getItem('x-access-token');
+        }
+        return sessionStorage.getItem('x-access-token');
+    }
+
+    set RefreshToken(token: string | null) {
+        this._refreshToken = token;
+        if (token) {
+            if (this._autoLogin) {
+                localStorage.setItem('x-refresh-token', token);
+            } else {
+                sessionStorage.setItem('x-refresh-token', token);
+            }
+        }
+    }
+
+    get RefreshToken(): string | null {
+        if (this._autoLogin) {
+            return localStorage.getItem('x-refresh-token');
+        }
+        return sessionStorage.getItem('x-refresh-token');
     }
 
     get CurrentUser(): IJwtModel | null {
-        const token = this.AccessToken;
+        const token = this._accessToken;
         try {
             const jwt = decodeJwt(token);
             return JSON.parse(jwt["http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata"])
         } catch (err) {
-            //console.log(err);
             return null;
         }
     }
@@ -35,7 +73,8 @@ class UserStorage {
     }
 
     get IsLogin() {
-        return !!this.AccessToken;
+        return !!this._accessToken;
     }
 }
+
 export const userStorage = new UserStorage();
