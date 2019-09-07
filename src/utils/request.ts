@@ -1,6 +1,6 @@
 /**
  * request 网络请求工具
- * 更详细的 api 文档: https://github.com/umijs/umi-request
+ * 更详细的 api 文档: https://github.com/umijs/umi-request
  */
 import { extend } from 'umi-request';
 import { notification } from 'antd';
@@ -53,7 +53,8 @@ if (process.env.NODE_ENV === "production") {
 
 const request = extend({
     headers: {
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
     },
     errorHandler, // 默认错误处理
     credentials: 'include', // 默认请求是否带上cookie,
@@ -65,17 +66,12 @@ const request = extend({
 request.interceptors.request.use((url, options) => {
     let token = localStorage.getItem("x-access-token");
     let headers = { ...options.headers };
-    if (url.indexOf("image") == -1) {
-        headers = Object.assign(headers, {
-            'Content-Type': 'application/json'
-        });
-    }
     if (token) {
-        const addheaders = {
+        headers = {
+            ...headers,
             'x-refresh-token': localStorage.getItem('x-refresh-token'),
             'Authorization': token
-        }
-        headers = Object.assign(headers, addheaders);
+        };
     }
     return (
         {

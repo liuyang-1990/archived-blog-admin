@@ -18,6 +18,8 @@ import 'braft-editor/dist/index.css';
 import 'braft-editor/dist/output.css';
 import 'braft-extensions/dist/table.css';
 import 'braft-extensions/dist/color-picker.css';
+import { getPageQuery } from '@/utils/utils';
+import { FormComponentProps } from 'antd/es/form';
 
 
 const FormItem = Form.Item;
@@ -37,7 +39,7 @@ BraftEditor.use(Table({
 }));
 
 @observer
-class PostArticle extends React.Component<any, any>{
+class PostArticle extends React.Component<FormComponentProps, any>{
 
     @lazyInject('ArticleState')
     private store!: ArticleState;
@@ -55,9 +57,27 @@ class PostArticle extends React.Component<any, any>{
         };
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         this.store.queryAllTags();
         this.store.queryAllCategories();
+        const params = getPageQuery();
+        let { postid } = params as { postid: number };
+        //编辑页面
+        if (postid) {
+            const detail = await this.store.getArticleDetail(postid);
+            if (detail) {
+                this.props.form.setFieldsValue({
+                    Title: detail.ArticleInfo.Title,
+                    Abstract: detail.ArticleInfo.Abstract,
+                    IsOriginal: detail.ArticleInfo.IsOriginal.toString(),
+                    Content: BraftEditor.createEditorState(detail.ArticleInfo.Content),
+                    Categories: detail.Categories.map(x => { return x.Key.toString() }),
+                    Tags: detail.Tags.map(x => { return x.Key.toString() }),
+                });
+                this.setState({ imageUrl: detail.ArticleInfo.ImageUrl });
+            }
+
+        }
     }
 
     handleEditorChange = (editorState) => {
@@ -109,11 +129,20 @@ class PostArticle extends React.Component<any, any>{
                 return;
             }
             const { imageUrl, status } = this.state;
-            const values = Object.assign(fieldsValue, {
+            let values = {
+                ...fieldsValue,
                 Content: fieldsValue.Content.toHTML(),
                 ImageUrl: imageUrl,
                 Status: status
-            });
+            };
+            const params = getPageQuery();
+            let { postid } = params as { postid: number };
+            if (postid) {
+                values = {
+                    ...values,
+                    Id: postid
+                }
+            }
             this.store.postArticle(values);
         });
     }

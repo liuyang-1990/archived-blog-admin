@@ -16,6 +16,6 @@ export enum TimeStringFormat {
 
 }
 
-export function toLocaleTimeString(time: string, format: TimeStringFormat = TimeStringFormat.STANDARD_TIME): string {
+export function toLocaleTimeString(time: string | moment.Moment | undefined, format: TimeStringFormat = TimeStringFormat.STANDARD_TIME): string {
   return moment(time).format(format);
 }
