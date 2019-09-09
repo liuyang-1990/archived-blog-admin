@@ -65,7 +65,7 @@ export default {
             {
               path: '/article/list',
               name: '文章列表',
-              component:'./Article/ArticleList'
+              component: './Article/ArticleList'
             },
             {
               path: '/article/post',
@@ -131,14 +131,11 @@ export default {
           name: '个人页',
           icon: 'user',
           path: '/account',
-          routes:[
-            {
-              path: '/account/center',
-              name: '个人中心',
-            },
+          routes: [
             {
               path: '/account/settings',
               name: '个人设置',
+              component: './Account/Settings'
             }
           ]
         },
