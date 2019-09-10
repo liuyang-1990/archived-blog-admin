@@ -7,6 +7,8 @@ import TagState from "@/states/tag.state";
 import CategoryState from "@/states/category.state";
 import ArticleState from "@/states/article.state";
 import ImageState from "@/states/image.state";
+import GeographicState from "@/states/geographic.state";
+
 
 
 const container: Container = new Container();
@@ -16,5 +18,6 @@ container.bind<TagState>("TagState").to(TagState);
 container.bind<CategoryState>("CategoryState").to(CategoryState);
 container.bind<ArticleState>("ArticleState").to(ArticleState);
 container.bind<ImageState>("ImageState").to(ImageState);
+container.bind<GeographicState>("GeographicState").to(GeographicState);
 export const { lazyInject } = getDecorators(container);
 export { container };

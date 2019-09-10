@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { Select, Spin } from 'antd';
 import styles from './GeographicView.less';
+import { observer } from 'mobx-react';
+import { lazyInject } from '@/utils/ioc';
+import GeographicState from '@/states/geographic.state';
+import { GeographicItemType } from '@/models/GeographicI';
 
 const { Option } = Select;
 
@@ -14,41 +18,22 @@ const nullSelectItem: SelectItem = {
 };
 
 
-export interface GeographicItemType {
-    name: string;
-    id: string;
-  }
+@observer
+class GeographicView extends Component<any, any> {
 
+    @lazyInject('GeographicState')
+    private store!: GeographicState;
 
-interface GeographicViewProps {
-    // dispatch?: Dispatch<any>;
-    province?: GeographicItemType[];
-    city?: GeographicItemType[];
-    value?: {
-        province: SelectItem;
-        city: SelectItem;
-    };
-    loading?: boolean;
-    onChange?: (value: { province: SelectItem; city: SelectItem }) => void;
-}
-
-
-class GeographicView extends Component<GeographicViewProps, any> {
-
-    componentDidMount() {
-
+    constructor(props) {
+        super(props);
     }
 
-    componentDidUpdate(props: GeographicViewProps) {
-        const { value } = this.props;
-
-        if (!props.value && !!value && !!value.province) {
-            
-        }
+    componentDidMount() {
+        this.store.getProvince();
     }
 
     getProvinceOption() {
-        const { province } = this.props;
+        const { province } = this.store;
         if (province) {
             return this.getOption(province);
         }
@@ -56,7 +41,7 @@ class GeographicView extends Component<GeographicViewProps, any> {
     }
 
     getCityOption = () => {
-        const { city } = this.props;
+        const { city } = this.store;
         if (city) {
             return this.getOption(city);
         }
@@ -68,7 +53,7 @@ class GeographicView extends Component<GeographicViewProps, any> {
             return (
                 <Option key={0} value={0}>
                     没有找到选项
-        </Option>
+                </Option>
             );
         }
         return list.map(item => (
@@ -79,14 +64,16 @@ class GeographicView extends Component<GeographicViewProps, any> {
     };
 
     selectProvinceItem = (item: SelectItem) => {
-        const { onChange } = this.props;
 
-        if (onChange) {
-            onChange({
-                province: item,
-                city: nullSelectItem,
-            });
-        }
+        this.store.getCity(item.key);
+        // const { onChange } = this.props;
+
+        // if (onChange) {
+        //     onChange({
+        //         province: item,
+        //         city: nullSelectItem,
+        //     });
+        // }
     };
 
     selectCityItem = (item: SelectItem) => {
@@ -116,9 +103,8 @@ class GeographicView extends Component<GeographicViewProps, any> {
 
     render() {
         const { province, city } = this.conversionObject();
-        const { loading } = this.props;
         return (
-            <Spin spinning={loading} wrapperClassName={styles.row}>
+            <Spin spinning={this.store.loading} wrapperClassName={styles.row}>
                 <Select
                     className={styles.item}
                     value={province}
