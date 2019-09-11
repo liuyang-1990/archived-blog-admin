@@ -4,18 +4,15 @@ import styles from './GeographicView.less';
 import { observer } from 'mobx-react';
 import { lazyInject } from '@/utils/ioc';
 import GeographicState from '@/states/geographic.state';
-import { GeographicItemType } from '@/models/GeographicI';
+import { GeographicItemType, SelectItem } from '@/models/GeographicI';
 
 const { Option } = Select;
 
-interface SelectItem {
-    label: string;
-    key: string;
-}
 const nullSelectItem: SelectItem = {
     label: '',
     key: '',
 };
+
 
 
 @observer
@@ -32,8 +29,15 @@ class GeographicView extends Component<any, any> {
         this.store.getProvince();
     }
 
+    componentDidUpdate(props) {
+        const { value } = this.props;
+        if (!props.value && !!value && !!value.province) {
+
+        }
+    }
+
     getProvinceOption() {
-        const { province } = this.store;
+        const { province } = this.props;
         if (province) {
             return this.getOption(province);
         }
@@ -41,7 +45,7 @@ class GeographicView extends Component<any, any> {
     }
 
     getCityOption = () => {
-        const { city } = this.store;
+        const { city } = this.props;
         if (city) {
             return this.getOption(city);
         }
@@ -64,16 +68,14 @@ class GeographicView extends Component<any, any> {
     };
 
     selectProvinceItem = (item: SelectItem) => {
-
-        this.store.getCity(item.key);
-        // const { onChange } = this.props;
-
-        // if (onChange) {
-        //     onChange({
-        //         province: item,
-        //         city: nullSelectItem,
-        //     });
-        // }
+        const { onChange } = this.props;
+        this.store.getCity(item);
+        if (onChange) {
+            onChange({
+                province: item,
+                city: nullSelectItem,
+            });
+        }
     };
 
     selectCityItem = (item: SelectItem) => {

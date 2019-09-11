@@ -25,28 +25,7 @@ const AvatarView = ({ avatar }: { avatar: string }) => (
         </Upload>
     </Fragment>
 );
-interface SelectItem {
-    label: string;
-    key: string;
-}
 
-const validatorGeographic = (
-    _: any,
-    value: {
-        province: SelectItem;
-        city: SelectItem;
-    },
-    callback: (message?: string) => void,
-) => {
-    const { province, city } = value;
-    if (!province.key) {
-        callback('Please input your province!');
-    }
-    if (!city.key) {
-        callback('Please input your city!');
-    }
-    callback();
-};
 
 interface BaseViewProps extends FormComponentProps {
     currentUser?: any;
@@ -79,12 +58,12 @@ class BaseView extends Component<BaseViewProps, any> {
         this.view = ref;
     };
 
-    handlerSubmit = (event: React.MouseEvent) => {
+    handleSubmit = (event: React.MouseEvent) => {
         event.preventDefault();
         const { form } = this.props;
-        form.validateFields(err => {
+        form.validateFields((err, fieldsValue) => {
             if (!err) {
-
+                console.log(fieldsValue);
             }
         });
     };
@@ -96,7 +75,7 @@ class BaseView extends Component<BaseViewProps, any> {
         return (
             <div className={styles.baseView} ref={this.getViewDom}>
                 <div className={styles.left}>
-                    <Form layout="vertical" hideRequiredMark>
+                    <Form layout="vertical" hideRequiredMark={true}>
                         <FormItem label={"邮箱"}>
                             {getFieldDecorator('email', {
                                 rules: [
@@ -118,51 +97,27 @@ class BaseView extends Component<BaseViewProps, any> {
                             })(<Input />)}
                         </FormItem>
                         <FormItem label={"个人简介"}>
-                            {getFieldDecorator('profile', {
-                                rules: [
-                                    {
-                                        required: true,
-                                        message: "请输入个人简介",
-                                    },
-                                ],
-                            })(
+                            {getFieldDecorator('profile')(
                                 <Input.TextArea
                                     placeholder={"个人简介"}
                                     rows={4}
-                                />,
+                                />
                             )}
                         </FormItem>
                         <FormItem label={"国家/地区"}>
-                            {getFieldDecorator('country')(
+                            {getFieldDecorator('country', { initialValue: 'China' })(
                                 <Select style={{ maxWidth: 220 }}>
                                     <Option value="China">中国</Option>
                                 </Select>,
                             )}
                         </FormItem>
                         <FormItem label={"所在省市"}>
-                            {getFieldDecorator('geographic', {
-                                rules: [
-                                    {
-                                        required: true,
-                                        message: "",
-                                    },
-                                    {
-                                        validator: validatorGeographic,
-                                    },
-                                ],
-                            })(<GeographicView />)}
+                            {getFieldDecorator('geographic')(<GeographicView />)}
                         </FormItem>
                         <FormItem label={"街道地址"}>
-                            {getFieldDecorator('address', {
-                                rules: [
-                                    {
-                                        required: true,
-                                        message: ""
-                                    },
-                                ],
-                            })(<Input />)}
+                            {getFieldDecorator('address')(<Input />)}
                         </FormItem>
-                        <Button type="primary" onClick={this.handlerSubmit}>
+                        <Button type="primary" onClick={this.handleSubmit}>
                             更新基本信息
                         </Button>
                     </Form>

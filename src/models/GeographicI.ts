@@ -4,3 +4,8 @@ export interface GeographicItemType {
     id: string;
 }
 
+
+export interface SelectItem {
+    label: string;
+    key: string;
+  }
