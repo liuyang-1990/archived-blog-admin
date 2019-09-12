@@ -1,9 +1,10 @@
 import { injectable } from "inversify";
 import { observable, action } from "mobx";
-import { queryByPage, addUser, deleteUser, UpdateStatus, updateUser } from "@/services/user.service";
+import { queryByPage, addUser, deleteUser, UpdateStatus, updateUser, getCurrentUser } from "@/services/user.service";
 import { ITableListData } from "@/models/TableList";
 import { message } from 'antd';
 import { IUserTableListItem, IUserTableListParams } from "@/models/UserTableList";
+import { userStorage } from "@/utils/user.storage";
 
 @injectable()
 export default class UserState {
@@ -95,4 +96,11 @@ export default class UserState {
     handleModalVisible = (flag?: boolean) => {
         this.modalVisible == !!flag;
     };
+
+    async getCurrentUser() {
+        if (userStorage.CurrentUser) {
+            return getCurrentUser(userStorage.CurrentUser.Uid);
+        }
+        return null;
+    }
 }

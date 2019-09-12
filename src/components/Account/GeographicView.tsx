@@ -25,19 +25,26 @@ class GeographicView extends Component<any, any> {
         super(props);
     }
 
-    componentDidMount() {
-        this.store.getProvince();
-    }
-
-    componentDidUpdate(props) {
-        const { value } = this.props;
-        if (!props.value && !!value && !!value.province) {
-
+    async componentDidMount() {
+        await this.store.getProvince();
+        const { onChange } = this.props;
+        const { province, city } = this.store;
+        if (onChange) {
+            onChange({
+                province: {
+                    label: province[0].name,
+                    key: province[0].id,
+                },
+                city: {
+                    label: city[0].name,
+                    key:  city[0].id,
+                }
+            });
         }
     }
 
     getProvinceOption() {
-        const { province } = this.props;
+        const { province } = this.store;
         if (province) {
             return this.getOption(province);
         }
@@ -45,7 +52,7 @@ class GeographicView extends Component<any, any> {
     }
 
     getCityOption = () => {
-        const { city } = this.props;
+        const { city } = this.store;
         if (city) {
             return this.getOption(city);
         }
@@ -67,13 +74,16 @@ class GeographicView extends Component<any, any> {
         ));
     };
 
-    selectProvinceItem = (item: SelectItem) => {
+    selectProvinceItem = async (item: SelectItem) => {
         const { onChange } = this.props;
-        this.store.getCity(item);
+        const city = await this.store.getCity(item);
         if (onChange) {
             onChange({
                 province: item,
-                city: nullSelectItem,
+                city: {
+                    label: city[0].name, //默认选中该省份下面的第一个城市
+                    key: city[0].id,
+                },
             });
         }
     };

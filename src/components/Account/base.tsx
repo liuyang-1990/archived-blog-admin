@@ -1,8 +1,11 @@
 import { Button, Form, Input, Select, Upload } from 'antd';
 import React, { Component, Fragment } from 'react';
-import { FormComponentProps } from 'antd/es/form';
 import GeographicView from './GeographicView';
 import styles from './BaseView.less';
+import { observer } from 'mobx-react';
+import { lazyInject } from '@/utils/ioc';
+import UserState from '@/states/user.state';
+import { userStorage } from '@/utils/user.storage';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -12,7 +15,7 @@ const AvatarView = ({ avatar }: { avatar: string }) => (
     <Fragment>
         <div className={styles.avatar_title}>
             头像
-    </div>
+         </div>
         <div className={styles.avatar}>
             <img src={avatar} alt="avatar" />
         </div>
@@ -20,26 +23,25 @@ const AvatarView = ({ avatar }: { avatar: string }) => (
             <div className={styles.button_view}>
                 <Button icon="upload">
                     更换头像
-        </Button>
+                </Button>
             </div>
         </Upload>
     </Fragment>
 );
 
-
-interface BaseViewProps extends FormComponentProps {
-    currentUser?: any;
-}
-
-class BaseView extends Component<BaseViewProps, any> {
+@observer
+class BaseView extends Component<any, any> {
     view: HTMLDivElement | undefined = undefined;
 
-    componentDidMount() {
-        this.setBaseInfo();
+    @lazyInject('UserState')
+    store!: UserState;
+    async componentDidMount() {
+        const currentUser = await this.store.getCurrentUser();
+        // this.setBaseInfo(currentUser);
     }
 
-    setBaseInfo = () => {
-        const { currentUser, form } = this.props;
+    setBaseInfo = currentUser => {
+        const { form } = this.props;
         if (currentUser) {
             Object.keys(form.getFieldsValue()).forEach(key => {
                 const obj = {};
@@ -50,8 +52,14 @@ class BaseView extends Component<BaseViewProps, any> {
     };
 
     getAvatarURL() {
-        const url = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
-        return url;
+        if (userStorage.CurrentUser) {
+            if (userStorage.CurrentUser.Avatar) {
+                return userStorage.CurrentUser.Avatar;
+            }
+            const url = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
+            return url;
+        }
+        return '';
     }
 
     getViewDom = (ref: HTMLDivElement) => {
@@ -63,7 +71,7 @@ class BaseView extends Component<BaseViewProps, any> {
         const { form } = this.props;
         form.validateFields((err, fieldsValue) => {
             if (!err) {
-                console.log(fieldsValue);
+                //console.log(fieldsValue);
             }
         });
     };
@@ -77,8 +85,12 @@ class BaseView extends Component<BaseViewProps, any> {
                 <div className={styles.left}>
                     <Form layout="vertical" hideRequiredMark={true}>
                         <FormItem label={"邮箱"}>
-                            {getFieldDecorator('email', {
+                            {getFieldDecorator('Email', {
                                 rules: [
+                                    {
+                                        type: 'email',
+                                        message: "邮箱格式不正确",
+                                    },
                                     {
                                         required: true,
                                         message: "请输入邮箱",
@@ -86,18 +98,18 @@ class BaseView extends Component<BaseViewProps, any> {
                                 ],
                             })(<Input />)}
                         </FormItem>
-                        <FormItem label={"昵称"}>
-                            {getFieldDecorator('name', {
+                        <FormItem label={"用户名"}>
+                            {getFieldDecorator('UserName', {
                                 rules: [
                                     {
                                         required: true,
-                                        message: "请输入昵称",
+                                        message: "请输入用户名",
                                     },
                                 ],
                             })(<Input />)}
                         </FormItem>
                         <FormItem label={"个人简介"}>
-                            {getFieldDecorator('profile')(
+                            {getFieldDecorator('Profile')(
                                 <Input.TextArea
                                     placeholder={"个人简介"}
                                     rows={4}
@@ -105,17 +117,17 @@ class BaseView extends Component<BaseViewProps, any> {
                             )}
                         </FormItem>
                         <FormItem label={"国家/地区"}>
-                            {getFieldDecorator('country', { initialValue: 'China' })(
+                            {getFieldDecorator('Country', { initialValue: 'China' })(
                                 <Select style={{ maxWidth: 220 }}>
                                     <Option value="China">中国</Option>
                                 </Select>,
                             )}
                         </FormItem>
                         <FormItem label={"所在省市"}>
-                            {getFieldDecorator('geographic')(<GeographicView />)}
+                            {getFieldDecorator('Geographic')(<GeographicView />)}
                         </FormItem>
                         <FormItem label={"街道地址"}>
-                            {getFieldDecorator('address')(<Input />)}
+                            {getFieldDecorator('Address')(<Input />)}
                         </FormItem>
                         <Button type="primary" onClick={this.handleSubmit}>
                             更新基本信息
@@ -130,4 +142,4 @@ class BaseView extends Component<BaseViewProps, any> {
     }
 }
 
-export default Form.create<BaseViewProps>()(BaseView);
+export default Form.create<any>()(BaseView);

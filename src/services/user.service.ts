@@ -8,6 +8,9 @@ export async function queryByPage(params?: Partial<IUserTableListParams>): Promi
     });
 }
 
+export async function getCurrentUser(id: number) {
+    return request(`user/${id}`);
+}
 
 export async function addUser(params: Partial<IUserTableListItem>): Promise<IResultModel<string>> {
     return request('user', {
@@ -31,7 +34,7 @@ export async function deleteUser(id: number): Promise<IResultModel<string>> {
 }
 
 
-export async function UpdateStatus(params:{ Ids: Array<number>, Status: number }): Promise<IResultModel<string>> {
+export async function UpdateStatus(params: { Ids: Array<number>, Status: number }): Promise<IResultModel<string>> {
     return request('user/status', {
         method: 'POST',
         data: params

@@ -9,10 +9,7 @@ export default class GeographicState {
     @observable loading: boolean = false;
     @observable province: Array<GeographicItemType> = [];
     @observable city: Array<GeographicItemType> = [];
-    @observable value!: {
-        province: SelectItem,
-        city: SelectItem
-    };
+
 
     @action
     async getProvince() {
@@ -21,16 +18,6 @@ export default class GeographicState {
         if (response) {
             this.province = response;
             this.city = await (getCity(this.province[0].id));
-            this.value = {
-                province: {
-                    label: this.province[0].name,
-                    key: this.province[0].id,
-                },
-                city: {
-                    label: this.city[0].name,
-                    key: this.city[0].id,
-                }
-            };
             this.loading = false;
         }
     }
@@ -42,14 +29,8 @@ export default class GeographicState {
         this.loading = false;
         if (response) {
             this.city = response;
-            this.value = {
-                province: item,
-                city: {
-                    label: response[0].name,
-                    key: response[0].id,
-                }
-            };
         }
+        return response;
     }
 
 }
