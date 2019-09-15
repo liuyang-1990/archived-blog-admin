@@ -27,9 +27,9 @@ class GeographicView extends Component<any, any> {
 
     async componentDidMount() {
         await this.store.getProvince();
-        const { onChange } = this.props;
+        const { onChange, value } = this.props;
         const { province, city } = this.store;
-        if (onChange) {
+        if (!value && onChange) {
             onChange({
                 province: {
                     label: province[0].name,
@@ -37,7 +37,7 @@ class GeographicView extends Component<any, any> {
                 },
                 city: {
                     label: city[0].name,
-                    key:  city[0].id,
+                    key: city[0].id,
                 }
             });
         }
