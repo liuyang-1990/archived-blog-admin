@@ -46,8 +46,10 @@ export default class UserState {
             switch (response.Status) {
                 case '0':
                     message.success(`${params.Id ? '更新' : '添加'}成功`);
-                    callback && callback();
-                    this.queryByPage();
+                    if(callback){
+                        callback();
+                        this.queryByPage();
+                    }
                     break;
                 case '1':
                     message.error(`${params.Id ? '更新' : '添加'}失败`);

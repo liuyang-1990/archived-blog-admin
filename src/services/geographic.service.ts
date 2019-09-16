@@ -1,5 +1,5 @@
 import request from "@/utils/request";
-import { GeographicItemType } from "@/models/GeographicI";
+import { GeographicItemType } from "@/models/Geographic";
 
 export async function getProvince():Promise<GeographicItemType[]> {
     return request('geographic/province');

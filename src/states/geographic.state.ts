@@ -1,7 +1,7 @@
 import { injectable } from "inversify";
 import { getProvince, getCity } from "@/services/geographic.service";
 import { action, observable } from "mobx";
-import { GeographicItemType, SelectItem } from "@/models/GeographicI";
+import { GeographicItemType, SelectItem } from "@/models/Geographic";
 
 @injectable()
 export default class GeographicState {
@@ -17,15 +17,14 @@ export default class GeographicState {
         const response = await getProvince();
         if (response) {
             this.province = response;
-            this.city = await (getCity(this.province[0].id));
             this.loading = false;
         }
     }
 
     @action
-    async getCity(item: SelectItem) {
+    async getCity(key:string) {
         this.loading = true;
-        const response = await getCity(item.key);
+        const response = await getCity(key);
         this.loading = false;
         if (response) {
             this.city = response;

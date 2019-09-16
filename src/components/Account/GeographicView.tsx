@@ -4,7 +4,7 @@ import styles from './GeographicView.less';
 import { observer } from 'mobx-react';
 import { lazyInject } from '@/utils/ioc';
 import GeographicState from '@/states/geographic.state';
-import { GeographicItemType, SelectItem } from '@/models/GeographicI';
+import { GeographicItemType, SelectItem } from '@/models/Geographic';
 
 const { Option } = Select;
 
@@ -27,19 +27,12 @@ class GeographicView extends Component<any, any> {
 
     async componentDidMount() {
         await this.store.getProvince();
-        const { onChange, value } = this.props;
-        const { province, city } = this.store;
-        if (!value && onChange) {
-            onChange({
-                province: {
-                    label: province[0].name,
-                    key: province[0].id,
-                },
-                city: {
-                    label: city[0].name,
-                    key: city[0].id,
-                }
-            });
+    }
+
+    componentDidUpdate(props) {
+        const { value } = this.props;
+        if (!props.value && !!value && !!value.province) {
+            this.store.getCity(value.province.key);
         }
     }
 
@@ -76,14 +69,11 @@ class GeographicView extends Component<any, any> {
 
     selectProvinceItem = async (item: SelectItem) => {
         const { onChange } = this.props;
-        const city = await this.store.getCity(item);
+        await this.store.getCity(item.key);
         if (onChange) {
             onChange({
                 province: item,
-                city: {
-                    label: city[0].name, //默认选中该省份下面的第一个城市
-                    key: city[0].id,
-                },
+                city: nullSelectItem
             });
         }
     };

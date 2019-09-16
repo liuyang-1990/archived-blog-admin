@@ -12,12 +12,6 @@ import ImageState from '@/states/image.state';
 const FormItem = Form.Item;
 const { Option } = Select;
 
-// 头像组件 方便以后独立，增加裁剪之类的功能
-const AvatarView = ({ avatar }: { avatar: string }) => (
-    <Fragment>
-
-    </Fragment>
-);
 
 @observer
 class BaseView extends Component<any, any> {
@@ -38,18 +32,14 @@ class BaseView extends Component<any, any> {
         const url = this.getAvatarURL();
         this.setState({ avatar: url });
         const currentUser = await this.store.getCurrentUser();
-        if (currentUser) {
-            currentUser.Geographic = {
-                province: {
-                    key: "410000",  
-                    label: "河南省"
-                },
-                city: {
-                    key: "411500",  
-                    label: "信阳市"
-                }
 
-            };
+        if (currentUser) {
+            if (currentUser.Province && currentUser.City) {
+                currentUser.Geographic = {
+                    province: JSON.parse(currentUser.Province),
+                    city: JSON.parse(currentUser.City),
+                };
+            }
             this.setBaseInfo(currentUser);
         }
 
@@ -114,7 +104,13 @@ class BaseView extends Component<any, any> {
         const { form } = this.props;
         form.validateFields((err, fieldsValue) => {
             if (!err) {
-                console.log(fieldsValue);
+                const values = {
+                    ...fieldsValue,
+                    Province: JSON.stringify(fieldsValue.Geographic.province),
+                    City: JSON.stringify(fieldsValue.Geographic.city),
+                    Id: userStorage.CurrentUser && userStorage.CurrentUser.Uid
+                };
+                this.store.handleOk(values);
             }
         });
     };
