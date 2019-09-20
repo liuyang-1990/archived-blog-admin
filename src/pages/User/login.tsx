@@ -39,7 +39,8 @@ class Login extends Component<any, any> {
 
     handleSubmit = (err: any, values: FormDataType) => {
         if (!err) {
-            this.store.handleSubmit(values, this.state.autoLogin);
+            localStorage.setItem("autoLogin",this.state.autoLogin);
+            this.store.handleSubmit(values);
         }
     };
 

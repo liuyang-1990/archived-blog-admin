@@ -41,102 +41,107 @@ export default {
     },
     {
       path: '/',
-      component: '../layouts/BasicLayout',
-      Routes: ['src/pages/Authorized'],
-      authority: ['admin', 'user'],
+      component: '../layouts/SecurityLayout',
       routes: [
-        { path: '/', redirect: '/dashboard/workplace' },
         {
-          name: 'Dashboard',
-          icon: 'dashboard',
-          path: '/dashboard',
+          path: '/',
+          component: '../layouts/BasicLayout',
+          authority: ['admin', 'user'],
           routes: [
+            { path: '/', redirect: '/dashboard/workplace' },
             {
-              path: '/dashboard/workplace',
-              name: '工作台',
-            },
-          ]
-        },
-        {
-          name: '文章',
-          icon: 'file-markdown',
-          path: '/article',
-          routes: [
-            {
-              path: '/article/list',
-              name: '文章列表',
-              component: './Article/ArticleList'
+              name: 'Dashboard',
+              icon: 'dashboard',
+              path: '/dashboard',
+              routes: [
+                {
+                  path: '/dashboard/workplace',
+                  name: '工作台',
+                },
+              ]
             },
             {
-              path: '/article/post',
-              name: '发文',
-              component: './Article/PostArticle',
-            },
-          ]
-        },
-        {
-          name: '分类',
-          icon: 'book',
-          path: '/category',
-          routes: [
-            {
-              path: '/category/list',
-              name: '分类列表',
-              component: './Category/CategoryInfo',
-            },
-          ]
-        },
-        {
-          name: '标签',
-          icon: 'tags',
-          path: '/tag',
-          routes: [
-            {
-              path: '/tag/list',
-              name: '标签列表',
-              component: './Tag/TagInfo',
-            },
-          ]
-        },
-        {
-          name: '系统页',
-          icon: 'setting',
-          path: '/system',
-          routes: [
-            {
-              path: '/system/user',
-              name: '用户管理',
-              component: './SystemManagement/UserInfo',
-            },
-          ]
-        },
-        {
-          name: '异常页',
-          icon: 'warning',
-          path: '/exception',
-          routes: [
-            {
-              path: '/exception/403',
-              name: '403',
-              component: './Exception/403',
+              name: '文章',
+              icon: 'file-markdown',
+              path: '/article',
+              routes: [
+                {
+                  path: '/article/list',
+                  name: '文章列表',
+                  component: './Article/ArticleList'
+                },
+                {
+                  path: '/article/post',
+                  name: '发文',
+                  component: './Article/PostArticle',
+                },
+              ]
             },
             {
-              path: '/exception/500',
-              name: '500',
-              component: './Exception/500',
+              name: '分类',
+              icon: 'book',
+              path: '/category',
+              routes: [
+                {
+                  path: '/category/list',
+                  name: '分类列表',
+                  component: './Category/CategoryInfo',
+                },
+              ]
             },
-          ]
-        },
-        {
-          name: '个人页',
-          icon: 'user',
-          path: '/account',
-          routes: [
             {
-              path: '/account/settings',
-              name: '个人设置',
-              component: './Account/Settings'
-            }
+              name: '标签',
+              icon: 'tags',
+              path: '/tag',
+              routes: [
+                {
+                  path: '/tag/list',
+                  name: '标签列表',
+                  component: './Tag/TagInfo',
+                },
+              ]
+            },
+            {
+              name: '系统页',
+              icon: 'setting',
+              path: '/system',
+              routes: [
+                {
+                  path: '/system/user',
+                  name: '用户管理',
+                  component: './SystemManagement/UserInfo',
+                },
+              ]
+            },
+            {
+              name: '异常页',
+              icon: 'warning',
+              path: '/exception',
+              routes: [
+                {
+                  path: '/exception/403',
+                  name: '403',
+                  component: './Exception/403',
+                },
+                {
+                  path: '/exception/500',
+                  name: '500',
+                  component: './Exception/500',
+                },
+              ]
+            },
+            {
+              name: '个人页',
+              icon: 'user',
+              path: '/account',
+              routes: [
+                {
+                  path: '/account/settings',
+                  name: '个人设置',
+                  component: './Account/Settings'
+                }
+              ]
+            },
           ]
         },
         {

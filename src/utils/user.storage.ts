@@ -10,7 +10,7 @@ export interface IJwtModel {
 class UserStorage {
 
     get AutoLogin(): boolean {
-        return true;
+        return !!localStorage.getItem("autoLogin");
     }
 
     set AccessToken(token: string | null) {

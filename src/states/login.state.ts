@@ -3,6 +3,7 @@ import { login } from '@/services/login.service';
 import { injectable } from 'inversify';
 import { getPageQuery } from '@/utils/utils';
 import router from 'umi/router';
+import { userStorage } from '@/utils/user.storage';
 
 
 export interface StateType {
@@ -20,19 +21,14 @@ export default class LoginState {
     @observable submitting: boolean = false;
     @observable stateType: StateType = {};
     @action.bound
-    async handleSubmit(params, autoLogin: boolean) {
+    async handleSubmit(params) {
         this.submitting = true;
         const response = await login(params);
         this.submitting = false;
         switch (response && response.Status) {
             case "0":
-                if (autoLogin) {
-                    localStorage.setItem("x-access-token", response.ResultInfo.AccessToken);
-                    localStorage.setItem("x-refresh-token", response.ResultInfo.RefreshToken);
-                } else {
-                    sessionStorage.setItem("x-access-token", response.ResultInfo.AccessToken);
-                    sessionStorage.setItem("x-refresh-token", response.ResultInfo.RefreshToken);
-                }
+                userStorage.AccessToken = response.ResultInfo.AccessToken;
+                userStorage.RefreshToken = response.ResultInfo.RefreshToken;
                 const urlParams = new URL(window.location.href);
                 const params = getPageQuery();
                 let { redirect } = params as { redirect: string };

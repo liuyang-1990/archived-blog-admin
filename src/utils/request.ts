@@ -37,7 +37,9 @@ const errorHandler = error => {
         return;
     }
     if (status == 401) {
-        router.push('/login');
+        if (window.location.href.indexOf('redirect') == -1) {
+            router.push('/login?redirect=' + encodeURIComponent(window.location.href));
+        }
         return;
     }
     notification.error({

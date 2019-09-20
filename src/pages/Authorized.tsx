@@ -3,6 +3,7 @@ import Redirect from 'umi/redirect';
 import pathToRegexp from 'path-to-regexp';
 import Authorized from '@/utils/Authorized';
 import { MenuDataItem } from '@ant-design/pro-layout';
+import { userStorage } from '@/utils/user.storage';
 
 export interface Route extends MenuDataItem {
   routes?: Route[];
@@ -28,12 +29,11 @@ const getRouteAuthority = (path: string, routeData: Route[]) => {
 
 class AuthComponent extends React.Component<any, any>{
   render() {
-    const isLogin: boolean = !!localStorage.getItem("access_token");
     const { routes = [] } = this.props.route;
     return (
       <Authorized
         authority={getRouteAuthority(this.props.location.pathname, routes) || ''}
-        noMatch={isLogin ? <Redirect to="/exception/403" /> : <Redirect to="/login" />}
+        noMatch={userStorage.IsLogin ? <Redirect to="/exception/403" /> : <Redirect to="/login" />}
       >
         {this.props.children}
       </Authorized>)

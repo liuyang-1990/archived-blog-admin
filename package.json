@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@ant-design/pro-layout": "^4.5.12",
-    "antd": "^3.21.2",
+    "antd": "^3.23.3",
     "braft-editor": "^2.3.7",
     "braft-extensions": "^0.0.18",
     "classnames": "^2.2.6",
