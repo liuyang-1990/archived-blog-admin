@@ -1,10 +1,8 @@
 import { userStorage } from "@/utils/user.storage";
+import settings from 'config/settings';
+import router from 'umi/router';
 
 export function uploadIamge(file, progress, success, error) {
-    let serverURL = "http://localhost:49911/api/v1/image/upload";
-    if (process.env.NODE_ENV === "production") {
-        serverURL = "https://api.nayoung515.top/api/v1/image/upload";
-    }
     const xhr = new XMLHttpRequest();
     const fd = new FormData();
     const successFn = () =>
@@ -17,13 +15,15 @@ export function uploadIamge(file, progress, success, error) {
     xhr.addEventListener('error', errorFn, false);
     xhr.addEventListener('abort', errorFn, false);
     fd.append('file', file);
-    xhr.open('POST', serverURL, true);
+    xhr.open('POST', `${settings.url}/api/v1/image/upload`, true);
     xhr.setRequestHeader("Accept", "application/json");
     const token = userStorage.AccessToken;
     const refreshToken = userStorage.RefreshToken;
     if (token && refreshToken) {
-        xhr.setRequestHeader("Authorization", token);
-        xhr.setRequestHeader("x-refresh-token", refreshToken);
+        xhr.setRequestHeader('Authorization', token);
+        xhr.setRequestHeader('x-refresh-token', refreshToken);
+    } else {
+        router.push('/login?redirect=' + encodeURIComponent(window.location.href));
     }
     xhr.send(fd);
 }

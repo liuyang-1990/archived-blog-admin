@@ -5,6 +5,8 @@
 import { extend } from 'umi-request';
 import { notification } from 'antd';
 import router from 'umi/router';
+import settings from 'config/settings';
+import { userStorage } from './user.storage';
 
 const codeMessage = {
     200: '服务器成功返回请求的数据。',
@@ -36,6 +38,7 @@ const errorHandler = error => {
         notification.error({ message: error.message });
         return;
     }
+    //授权过期，跳转到登录界面
     if (status == 401) {
         if (window.location.href.indexOf('redirect') == -1) {
             router.push('/login?redirect=' + encodeURIComponent(window.location.href));
@@ -48,30 +51,26 @@ const errorHandler = error => {
     });
 };
 
-let url = "http://localhost:49911/api/v1/";
-if (process.env.NODE_ENV === "production") {
-    url = "https://api.nayoung515.top/api/v1/";
-}
-
 const request = extend({
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     },
+    useCache: true,
     errorHandler, // 默认错误处理
     credentials: 'include', // 默认请求是否带上cookie,
-    prefix: url,
+    prefix: `${settings.url}/api/v1/`,
 });
-
 
 // request拦截器
 request.interceptors.request.use((url, options) => {
-    let token = localStorage.getItem("x-access-token");
+    const token = userStorage.AccessToken;
+    const refreshToken = userStorage.RefreshToken;
     let headers = { ...options.headers };
-    if (token) {
+    if (token && refreshToken) {
         headers = {
             ...headers,
-            'x-refresh-token': localStorage.getItem('x-refresh-token'),
+            'x-refresh-token': refreshToken,
             'Authorization': token
         };
     }
@@ -87,10 +86,9 @@ request.interceptors.request.use((url, options) => {
 request.interceptors.response.use((response, options) => {
     let token = response.headers.get("authorization");
     if (token) {
-        localStorage.setItem('x-access-token', token);
+        userStorage.AccessToken = token;
     }
     return response;
 });
-
 
 export default request;
