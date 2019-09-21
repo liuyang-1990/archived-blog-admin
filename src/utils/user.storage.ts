@@ -58,7 +58,7 @@ class UserStorage {
     }
 
     get Authority() {
-        return this.CurrentUser && this.CurrentUser.Role;
+        return this.CurrentUser && this.CurrentUser.Role.toLowerCase();
     }
 
     get IsLogin() {

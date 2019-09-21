@@ -46,7 +46,7 @@ export default {
         {
           path: '/',
           component: '../layouts/BasicLayout',
-          authority: ['admin', 'user'],
+          Routes: ['src/pages/Authorized'],
           routes: [
             { path: '/', redirect: '/dashboard/workplace' },
             {
@@ -73,6 +73,7 @@ export default {
                 {
                   path: '/article/post',
                   name: '发文',
+                  authority: ['admin'],
                   component: './Article/PostArticle',
                 },
               ]
@@ -81,10 +82,12 @@ export default {
               name: '分类',
               icon: 'book',
               path: '/category',
+              authority: ['admin'],
               routes: [
                 {
                   path: '/category/list',
-                  name: '分类列表',
+                  name: '分类列表',   
+                  authority: ['admin'],             
                   component: './Category/CategoryInfo',
                 },
               ]
@@ -93,10 +96,12 @@ export default {
               name: '标签',
               icon: 'tags',
               path: '/tag',
+              authority: ['admin'],
               routes: [
                 {
                   path: '/tag/list',
                   name: '标签列表',
+                  authority: ['admin'],
                   component: './Tag/TagInfo',
                 },
               ]
@@ -105,10 +110,12 @@ export default {
               name: '系统页',
               icon: 'setting',
               path: '/system',
+              authority: ['admin'],
               routes: [
                 {
                   path: '/system/user',
                   name: '用户管理',
+                  authority: ['admin'],
                   component: './SystemManagement/UserInfo',
                 },
               ]

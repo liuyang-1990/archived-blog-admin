@@ -5,14 +5,17 @@ import PageLoading from '@/components/PageLoading';
 import { userStorage } from '@/utils/user.storage';
 
 
-interface SecurityLayoutState {
+interface ISecurityLayoutState {
     isReady: boolean;
 }
 
-class SecurityLayout extends React.Component<any, SecurityLayoutState> {
-    state: SecurityLayoutState = {
-        isReady: false,
-    };
+class SecurityLayout extends React.Component<any, ISecurityLayoutState> {
+    constructor(props){
+        super(props);
+        this.state={
+            isReady: false
+        }
+    }
 
     componentDidMount() {
         this.setState({
@@ -27,7 +30,7 @@ class SecurityLayout extends React.Component<any, SecurityLayoutState> {
         const queryString = stringify({
             redirect: window.location.href,
         });
-        if ((!isLogin) || !isReady) {
+        if (!isReady) {
             return <PageLoading />;
         }
         if (!isLogin) {
