@@ -1,6 +1,7 @@
 import { userStorage } from "@/utils/user.storage";
-import settings from 'config/settings';
+import settings from '@/settings';
 import router from 'umi/router';
+import { stringify } from 'querystring';
 
 export function uploadIamge(file, progress, success, error) {
     const xhr = new XMLHttpRequest();
@@ -23,7 +24,10 @@ export function uploadIamge(file, progress, success, error) {
         xhr.setRequestHeader('Authorization', token);
         xhr.setRequestHeader('x-refresh-token', refreshToken);
     } else {
-        router.push('/login?redirect=' + encodeURIComponent(window.location.href));
+        const queryString = stringify({
+            redirect: window.location.href,
+        });
+        router.push(`/login?${queryString}`);
     }
     xhr.send(fd);
 }

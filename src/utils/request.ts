@@ -5,8 +5,9 @@
 import { extend } from 'umi-request';
 import { notification } from 'antd';
 import router from 'umi/router';
-import settings from 'config/settings';
 import { userStorage } from './user.storage';
+import settings from '@/settings';
+import { stringify } from 'querystring';
 
 const codeMessage = {
     200: '服务器成功返回请求的数据。',
@@ -34,21 +35,27 @@ const errorHandler = error => {
     const { response = {} } = error;
     const errortext = codeMessage[response.status] || response.statusText;
     const { status, url } = response;
-    if (!status) {
-        notification.error({ message: error.message });
-        return;
-    }
-    //授权过期，跳转到登录界面
-    if (status == 401) {
-        if (window.location.href.indexOf('redirect') == -1) {
-            router.push('/login?redirect=' + encodeURIComponent(window.location.href));
+    if (response && response.status) {
+        //授权过期，跳转到登录界面
+        if (status == 401) {
+            if (window.location.href.indexOf('redirect') == -1) {
+                const queryString = stringify({
+                    redirect: window.location.href,
+                });
+                router.push(`/login?${queryString}`);
+            }
+            return;
         }
-        return;
+        notification.error({
+            message: `请求错误 ${status}: ${url}`,
+            description: errortext,
+        });
+    } else {
+        notification.error({
+            description: '您的网络发生异常，无法连接服务器',
+            message: '网络异常',
+        });
     }
-    notification.error({
-        message: `请求错误 ${status}: ${url}`,
-        description: errortext,
-    });
 };
 
 const request = extend({

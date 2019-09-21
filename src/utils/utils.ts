@@ -1,4 +1,4 @@
-import { parse } from 'qs';
+import { parse } from 'querystring';
 import jwt_decode from 'jwt-decode';
 import moment from 'moment';
 
