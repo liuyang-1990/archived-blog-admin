@@ -16,8 +16,6 @@ pipeline {
                 sh 'npm install' 
             }
         }
-    }
-    stages {
         stage('Build') { 
             steps {
                 sh 'npm run build' 
