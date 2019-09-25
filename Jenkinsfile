@@ -9,7 +9,7 @@ pipeline {
         CI = 'true'
     }
     stages {
-        stage('Build') { 
+        stage('init') { 
             steps {
                 sh 'node -v'
                 sh 'yarn -v'
