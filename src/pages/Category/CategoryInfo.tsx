@@ -10,7 +10,7 @@ import { toLocaleTimeString } from '@/utils/utils';
 import { ICategoryTableListItem, ICategoryTableListParams } from '@/models/CategoryTableList';
 import { ITableListPagination } from '@/models/TableList';
 import { SorterResult } from 'antd/lib/table';
-import CategoryModalForm from './categoryModal';
+import CategoryModalForm from './CategoryModal';
 
 const FormItem = Form.Item;
 

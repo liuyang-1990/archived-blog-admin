@@ -35,7 +35,7 @@ export default {
       routes: [
         {
           path: '/login',
-          component: './User/login',
+          component: './User/Login',
         },
       ],
     },
