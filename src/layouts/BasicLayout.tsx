@@ -46,11 +46,12 @@ const links = [{
   blankTarget: true,
 },
 {
-  key: 'Ant Design',
-  title: 'Ant Design',
-  href: 'https://ant.design',
+  key: 'beian',
+  title: '豫ICP备18041733号-1',
+  href: 'https://www.beian.miit.gov.cn',
   blankTarget: true,
 }];
+
 
 const copyright = (
   <Fragment>

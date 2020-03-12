@@ -4,6 +4,17 @@ import logo from '../assets/logo.svg';
 import styles from './UserLayout.less';
 import FooterView from '@ant-design/pro-layout/lib/Footer';
 
+
+
+const links = [
+  {
+    key: 'beian',
+    title: '豫ICP备18041733号-1',
+    href: 'https://www.beian.miit.gov.cn',
+    blankTarget: true,
+  }];
+
+
 class UserLayout extends React.Component<any, any> {
   render() {
     return (
@@ -20,7 +31,7 @@ class UserLayout extends React.Component<any, any> {
           </div>
           {this.props.children}
         </div>
-        <FooterView copyright="2019 created by liuyang | Powered by .Net Core 2.2 on Linux" />
+        <FooterView copyright="2020 created by liuyang | Powered by .Net Core 2.2 on Linux" links={links} />
       </div>
     );
 
